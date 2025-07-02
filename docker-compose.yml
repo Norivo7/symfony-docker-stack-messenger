@@ -1,0 +1,95 @@
+services:
+  php:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    volumes:
+      - ./:/var/www/html
+    networks:
+      - symfony
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "8080:80"
+    depends_on:
+      - php
+    networks:
+      - symfony
+
+  mysql:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: symfony
+      MYSQL_USER: symfony
+      MYSQL_PASSWORD: symfony
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - symfony
+
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: symfony
+      POSTGRES_PASSWORD: symfony
+      POSTGRES_DB: symfony
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - symfony
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - symfony
+
+  varnish:
+    image: varnish
+    ports:
+    - "8082:80"
+    depends_on:
+      - nginx
+    networks:
+      - symfony
+    command: |
+      varnishd -F -f /etc/varnish/default.vcl -a :80 -s malloc,256m
+    volumes:
+    - ./docker/varnish/default.vcl:/etc/varnish/default.vcl
+
+  phpmyadmin:
+    image: phpmyadmin
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: mysql
+    depends_on:
+      - mysql
+    networks:
+      - symfony
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+    - "8083:80"
+    depends_on:
+      - postgres
+    networks:
+      - symfony
+
+volumes:
+  mysql_data:
+  pg_data:
+
+networks:
+  symfony:
+    driver: bridge

@@ -1,0 +1,13 @@
+/vendor
+/var
+/node_modules
+.env
+.env.local
+.env.*.local
+/public/bundles/
+/config/secrets/
+/docker/php/.bash_history
+.idea/
+/.symfony
+symfony.lock
+.DS_Store
