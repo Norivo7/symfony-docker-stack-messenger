@@ -58,9 +58,9 @@ composer install
 
 ### 🔁 Available Endpoints
 
-|    Route    |   Method  |  Description  |
-|-------------|-----------|---------------|
-
+| Route | Method | Description  |
+|-------|--------|--------------|
+| /ping | GET    | Health Check |
 
 ### 🧠 TODO Ideas
 - /tasks endpoint + async handling via Messenger
