@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace App\Message;
 
-final readonly class PingMessage
+use App\Contract\AsyncMessageInterface;
+
+final readonly class PingMessage implements AsyncMessageInterface
 {
     private string $payload;
 
