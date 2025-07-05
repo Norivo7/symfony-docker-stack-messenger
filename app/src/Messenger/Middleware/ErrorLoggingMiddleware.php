@@ -5,24 +5,31 @@ namespace App\Messenger\Middleware;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Exception\ExceptionInterface;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 
 final class ErrorLoggingMiddleware implements MiddlewareInterface
 {
-    public function __construct(private readonly LoggerInterface $logger) {}
+    public function __construct(private LoggerInterface $logger) {}
 
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
+        $messageClass = get_class($envelope->getMessage());
+        $start = microtime(true);
+
         try {
-            return $stack->next()->handle($envelope, $stack);
-        } catch (ExceptionInterface $exception) {
-            $this->logger->error('Messenger error: ' . $exception->getMessage(), [
-                'exception' => $exception,
-                'message_class' => get_class($envelope->getMessage())
+            $result = $stack->next()->handle($envelope, $stack);
+        } catch (\Throwable $throwable) {
+            $this->logger->error('Messenger error: ' . $throwable->getMessage(), [
+                'exception' => $throwable,
+                'message_class' => $messageClass
             ]);
-            throw $exception;
+            throw $throwable;
         }
+
+        $duration = round((microtime(true) - $start) * 1000, 2);
+        $this->logger->info(" Handled $messageClass in {$duration}ms");
+
+        return $result;
     }
 }
