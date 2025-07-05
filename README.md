@@ -58,9 +58,12 @@ composer install
 
 ### 🔁 Available Endpoints
 
-| Route | Method | Description  |
-|-------|--------|--------------|
-| /ping | GET    | Health Check |
+| Route         | Method | Description     |
+|---------------|--------|-----------------|
+| /ping         | GET    | instant message |
+| /delayedPing  | GET    | 5000 ms delay   |
+| /failedPing   | GET    | failed ping     |
+
 
 ### 🧠 TODO Ideas
 - /tasks endpoint + async handling via Messenger
