@@ -17,7 +17,7 @@ final readonly class SendEmailMessageHandler
 
     public function __invoke(SendEmailMessage $message): void
     {
-        $email = new Email()
+        $email = (new Email())
             ->from('no-reply@john.doe')
             ->to($message->to)
             ->subject($message->subject)
