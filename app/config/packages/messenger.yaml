@@ -4,16 +4,18 @@ framework:
 
         transports:
             # https://symfony.com/doc/current/messenger.html#transport-configuration
-            async: 'redis://redis:6379/messages'
-#                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
-#                options:
-#                    use_notify: true
-#                    check_delayed_interval: 60000
-#                retry_strategy:
-#                    max_retries: 3
-#                    multiplier: 2
+#            async: 'redis://redis:6379/messages'
+            async:
+                dsn: 'redis://redis:6379/messages'
+                retry_strategy:
+                    max_retries: 3
+                    delay: 1000
+                    multiplier: 2
+                    max_delay: 10000
+
             failed: 'doctrine://default?queue_name=failed'
-#            # sync: 'sync://'
+#            failed: 'redis://redis:6379/failed'
+            # sync: 'sync://'
 
         default_bus: messenger.bus.default
 
