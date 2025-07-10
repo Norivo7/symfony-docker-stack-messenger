@@ -8,8 +8,9 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 
-final class ErrorLoggingMiddleware implements MiddlewareInterface
+final readonly class ErrorLoggingMiddleware implements MiddlewareInterface
 {
+    // todo: separate performance metrics | single responsibility principle
     public function __construct(private LoggerInterface $logger) {}
 
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
