@@ -11,7 +11,7 @@ final class PingMessageHandler
 {
     public function __invoke(PingMessage $message): void
     {
-        dump('✅ Ping handled: ' . $message->getLogContext());
+        dump('✅ Ping handled: ' . $message->getLogContext()['payload']);
     }
 
 }
