@@ -5,13 +5,13 @@ namespace App\Message;
 
 use App\Contract\AsyncMessageInterface;
 
-final class FailingMessage implements AsyncMessageInterface
+final readonly class FailingMessage implements AsyncMessageInterface
 {
 
     public function __construct(private string $payload = 'fail') {}
 
-    public function getPayload(): string
+    public function getLogContext(): array
     {
-        return $this->payload;
+        return ['payload' => $this->payload];
     }
 }

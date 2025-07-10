@@ -7,16 +7,12 @@ use App\Contract\AsyncMessageInterface;
 
 final readonly class PingMessage implements AsyncMessageInterface
 {
-    private string $payload;
 
-    public function __construct(string $payload)
-    {
-        $this->payload = $payload;
-    }
+    public function __construct(private string $payload = 'Ping.') {}
 
-    public function getPayload(): string
+    public function getLogContext(): array
     {
-        return $this->payload;
+        return ['payload' => $this->payload];
     }
 
 }

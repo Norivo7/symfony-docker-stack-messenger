@@ -5,5 +5,5 @@ namespace App\Contract;
 
 interface AsyncMessageInterface
 {
-    public function getPayload(): string;
+    public function getLogContext(): array;
 }
