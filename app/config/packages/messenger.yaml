@@ -22,6 +22,7 @@ framework:
         buses:
             messenger.bus.default:
                 middleware:
+                    - App\Messenger\Middleware\ValidationMiddleware
                     - App\Messenger\Middleware\ErrorLoggingMiddleware
         routing:
             Symfony\Component\Mailer\Messenger\SendEmailMessage: async
