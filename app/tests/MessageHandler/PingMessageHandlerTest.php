@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace App\Tests\MessageHandler;
 
-use App\Message\PingMessage;
-use App\MessageHandler\PingMessageHandler;
+use App\Command\PingCommand;
+use App\CommandHandler\PingCommandHandler;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
@@ -13,8 +13,8 @@ final class PingMessageHandlerTest extends TestCase
     public function testPing(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
-        $message = new PingMessage('ping test');
-        $handler = new PingMessageHandler($logger);
+        $message = new PingCommand('ping test');
+        $handler = new PingCommandHandler($logger);
 
         $this->expectNotToPerformAssertions();
 
@@ -28,8 +28,8 @@ final class PingMessageHandlerTest extends TestCase
             ->method('info')
             ->with($this->stringContains('Ping handled'));
 
-        $message = new PingMessage('ping');
-        $handler = new PingMessageHandler($logger);
+        $message = new PingCommand('ping');
+        $handler = new PingCommandHandler($logger);
 
         $handler($message);
     }
