@@ -40,12 +40,12 @@ docker compose up -d --build
 
 ### 3. Access the app
 
-|       Tool       |         URL         |
--------------------|---------------------|
-|  app	           | http://localhost:8080
-|  phpMyAdmin	   | http://localhost:8081
-|  Varnish         | http://localhost:8082
-|  pgAdmin	       | http://localhost:8083
+| Tool        | URL                   |
+|-------------|-----------------------|
+| app	        | http://localhost:8080 |
+| phpMyAdmin	 | http://localhost:8081 |
+| Varnish     | http://localhost:8082 |
+| pgAdmin	    | http://localhost:8083 |
 
 ###  4. Enter the PHP container and install dependencies
 
@@ -58,11 +58,13 @@ composer install
 
 ### 🔁 Available Endpoints
 
-| Route         | Method | Description     |
-|---------------|--------|-----------------|
-| /ping         | GET    | instant message |
-| /delayedPing  | GET    | 5000 ms delay   |
-| /failedPing   | GET    | failed ping     |
+| Route            | Description            |
+|------------------|------------------------|
+| /ping            | instant message        |
+| /delayed-ping    | 5000 ms delay          |
+| /failed-ping     | failed ping            |
+| /send-email      | add email to queue     |
+| /send-email-fail | email syntax violation |
 
 
 ### 🧠 TODO Ideas
@@ -71,3 +73,5 @@ composer install
 - Add JWT authentication
 - Add CI/CD pipeline (e.g. GitHub Actions)
 - Setup Swagger/OpenAPI
+- CQRS implementation
+- DDD implentation
