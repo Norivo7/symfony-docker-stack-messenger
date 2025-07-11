@@ -22,7 +22,7 @@ final class HomeController extends AbstractController
     }
 
     // docker compose exec php php bin/console messenger:consume async -vv
-    #[Route('/delayedPing', name: 'delayedPing', methods: ['GET'])]
+    #[Route('/delayed-ping', name: 'delayed_ping', methods: ['GET'])]
     public function messengerDelayedPing(MessageBusInterface $messageBus): JsonResponse
     {
         $messageBus->dispatch(new PingMessage('Hello World!'),
@@ -30,7 +30,7 @@ final class HomeController extends AbstractController
         return new JsonResponse(['status' => 'Message dispatched']);
     }
 
-    #[Route('/failedPing', name: 'failedPing', methods: ['GET'])]
+    #[Route('/failed-ping', name: 'failed_ping', methods: ['GET'])]
     public function messengerFail(MessageBusInterface $messageBus): JsonResponse
     {
         $messageBus->dispatch(new FailingMessage());
@@ -42,6 +42,18 @@ final class HomeController extends AbstractController
     {
         $messageBus->dispatch(new SendEmailMessage(
             'szymik.kamil97@gmail.com',
+            'Welcome!',
+            'John Doe'
+        ));
+
+        return new JsonResponse(['status' => 'Message dispatched']);
+    }
+
+    #[Route('/send-email-fail', name: 'send_email_fail')]
+    public function sendEmailFail(MessageBusInterface $messageBus): JsonResponse
+    {
+        $messageBus->dispatch(new SendEmailMessage(
+            'thisisnotanemail',
             'Welcome!',
             'John Doe'
         ));
