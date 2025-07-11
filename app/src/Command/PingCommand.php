@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Message;
+namespace App\Command;
 
+use App\Command\Traits\ContextLoggableTrait;
 use App\Contract\AsyncMessageInterface;
-use App\Message\Traits\ContextLoggableTrait;
 
-final readonly class PingMessage implements AsyncMessageInterface
+final readonly class PingCommand implements AsyncMessageInterface
 {
     use ContextLoggableTrait;
 

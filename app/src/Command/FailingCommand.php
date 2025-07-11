@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Message;
+namespace App\Command;
 
+use App\Command\Traits\ContextLoggableTrait;
 use App\Contract\AsyncMessageInterface;
-use App\Message\Traits\ContextLoggableTrait;
 
-final readonly class FailingMessage implements AsyncMessageInterface
+final readonly class FailingCommand implements AsyncMessageInterface
 {
     use ContextLoggableTrait;
 

@@ -1,19 +1,17 @@
 <?php
 declare(strict_types=1);
 
-namespace App\MessageHandler;
+namespace App\CommandHandler;
 
-use App\Message\SendEmailMessage;
+use App\Command\SendEmailCommand;
 use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Mime\Email;
 
-#[AsMessageHandler]
-final readonly class SendEmailMessageHandler
+final readonly class SendEmailCommandHandler
 {
     public function __construct(private MailerInterface $mailer) {}
 
-    public function __invoke(SendEmailMessage $message): void
+    public function __invoke(SendEmailCommand $message): void
     {
         $email = (new Email())
             ->from('no-reply@john.doe')
