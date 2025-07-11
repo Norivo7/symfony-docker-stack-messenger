@@ -1,5 +1,7 @@
 framework:
     messenger:
+        default_bus: messenger.bus.default
+
         failure_transport: failed
 
         transports:
@@ -17,18 +19,27 @@ framework:
 #            failed: 'redis://redis:6379/failed'
             # sync: 'sync://'
 
-        default_bus: messenger.bus.default
-
         buses:
             messenger.bus.default:
                 middleware:
                     - App\Messenger\Middleware\ValidationMiddleware
                     - App\Messenger\Middleware\ErrorLoggingMiddleware
+
+            messenger.bus.command:
+                middleware:
+                    - App\Messenger\Middleware\ValidationMiddleware
+                    - App\Messenger\Middleware\ErrorLoggingMiddleware
+
+            messenger.bus.query:
+                middleware:
+                    - App\Messenger\Middleware\ValidationMiddleware
+                    - App\Messenger\Middleware\ErrorLoggingMiddleware
+
         routing:
             Symfony\Component\Mailer\Messenger\SendEmailMessage: async
             Symfony\Component\Notifier\Message\ChatMessage: async
             Symfony\Component\Notifier\Message\SmsMessage: async
-            'App\Message\*': async
+            'App\Command\*': async
 
             # Route your messages to the transports
             # 'App\Message\YourMessage': async
