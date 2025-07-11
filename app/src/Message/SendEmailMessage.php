@@ -17,9 +17,9 @@ final readonly class SendEmailMessage implements AsyncMessageInterface
     public function getLogContext(): array
     {
         return [
-            'to' =>$this->to,
-            'subject' =>$this->subject,
-            'content' =>$this->content
+            'to' => $this->to,
+            'subject' => $this->subject,
+            'content' => $this->content
             ];
     }
 }

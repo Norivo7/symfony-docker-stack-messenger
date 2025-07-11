@@ -11,9 +11,7 @@ use Symfony\Component\Mime\Email;
 #[AsMessageHandler]
 final readonly class SendEmailMessageHandler
 {
-    public function __construct(private MailerInterface $mailer)
-    {
-    }
+    public function __construct(private MailerInterface $mailer) {}
 
     public function __invoke(SendEmailMessage $message): void
     {
