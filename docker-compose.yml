@@ -63,6 +63,14 @@ services:
     volumes:
     - ./docker/varnish/default.vcl:/etc/varnish/default.vcl
 
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    networks:
+      - symfony
+
   phpmyadmin:
     image: phpmyadmin
     ports:

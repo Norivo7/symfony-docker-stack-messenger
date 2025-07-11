@@ -5,6 +5,7 @@ namespace App\Controller;
 
 use App\Message\FailingMessage;
 use App\Message\PingMessage;
+use App\Message\SendEmailMessage;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -35,5 +36,18 @@ final class HomeController extends AbstractController
         $messageBus->dispatch(new FailingMessage());
         return new JsonResponse(['status' => 'Message dispatched']);
     }
+
+    #[Route('/send-email', name: 'send_email')]
+    public function sendEmail(MessageBusInterface $messageBus): JsonResponse
+    {
+        $messageBus->dispatch(new SendEmailMessage(
+            'szymik.kamil97@gmail.com',
+            'Welcome!',
+            'John Doe'
+        ));
+
+        return new JsonResponse(['status' => 'Message dispatched']);
+    }
+
 
 }
