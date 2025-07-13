@@ -17,5 +17,6 @@ services:
         resource: '../src/'
     App\Messenger\Middleware\ErrorLoggingMiddleware:
         tags: [messenger.middleware]
+    App\Domain\User\UserRepositoryInterface: '@App\Infrastructure\User\InMemoryUserRepository'
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
