@@ -9,7 +9,7 @@ use App\Domain\User\UserRepositoryInterface;
 final class InMemoryUserRepository implements UserRepositoryInterface
 {
     /** @var User[] */
-    private array $users = [];
+    private array $users;
 
     public function __construct()
     {

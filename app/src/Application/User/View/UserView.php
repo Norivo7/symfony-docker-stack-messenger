@@ -6,7 +6,7 @@ namespace App\Application\User\View;
 final readonly class UserView
 {
     public function __construct(
-        public int    $id,
+        public int $id,
         public string $email,
     ) {}
 
