@@ -15,8 +15,13 @@ services:
     # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../src/'
+    # add more service definitions when explicit configuration is needed
+    # please note that last definitions always *replace* previous ones
     App\Messenger\Middleware\ErrorLoggingMiddleware:
         tags: [messenger.middleware]
     App\Domain\User\UserRepositoryInterface: '@App\Infrastructure\User\InMemoryUserRepository'
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+    # task module
+    App\Task\Infrastructure\Doctrine\DoctrineTaskRepository:
+        arguments:
+            - '@doctrine.orm.entity_manager'
+    App\Task\TaskRepositoryInterface: '@App\Task\Infrastructure\Doctrine\DoctrineTaskRepository'
