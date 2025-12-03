@@ -6,6 +6,7 @@ namespace App\Task\Application;
 final readonly class CreateTaskCommand
 {
     public function __construct(
+        public string $id,
         public string $title,
     ) {
     }

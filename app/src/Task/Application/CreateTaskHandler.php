@@ -17,12 +17,8 @@ final readonly class CreateTaskHandler
 
     public function __invoke(CreateTaskCommand $command): void
     {
-        // todo: use a better id generator
-        $id = bin2hex(random_bytes(16));
-
-        $task = Task::create($id, $command->title);
+        $task = Task::create($command->id, $command->title);
 
         $this->taskRepository->save($task);
     }
-
 }
