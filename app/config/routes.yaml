@@ -3,3 +3,8 @@ controllers:
         path: ../src/Controller/
         namespace: App\Controller
     type: attribute
+task_controllers:
+    resource:
+        path: ../src/Task/Presentation/
+        namespace: App\Task\Presentation
+    type: attribute
