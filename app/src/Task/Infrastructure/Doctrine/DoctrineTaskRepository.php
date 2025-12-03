@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Task\Infrastructure\Doctrine;
 
 use App\Task\Domain\Task;
+use App\Task\Domain\TaskNotFoundException;
 use App\Task\Domain\TaskRepositoryInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -27,7 +28,7 @@ final readonly class DoctrineTaskRepository implements TaskRepositoryInterface
         $entity = $this->entityManager->find(TaskEntity::class, $taskId);
 
         if (!$entity instanceof TaskEntity) {
-            throw new \RuntimeException("Task with ID {$taskId} not found.");
+            throw new TaskNotFoundException("Task with ID {$taskId} not found.");
         }
 
         return TaskMapper::fromEntity($entity);
