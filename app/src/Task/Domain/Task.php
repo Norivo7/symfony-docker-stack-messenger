@@ -6,10 +6,10 @@ namespace App\Task\Domain;
 final class Task
 {
     private function __construct(
-        private string $id,
-        private string $title,
+        private readonly string $id,
+        private readonly string $title,
         private TaskStatus $status,
-        private \DateTimeImmutable $createdAt,
+        private readonly \DateTimeImmutable $createdAt,
         private ?\DateTimeImmutable $completedAt,
     ) {
     }
