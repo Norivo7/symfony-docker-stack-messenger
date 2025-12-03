@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Task\Presentation;
 
 use App\Task\Application\CreateTaskCommand;
+use App\Task\Domain\TaskNotFoundException;
+use App\Task\Domain\TaskRepositoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,6 +17,7 @@ final class TaskController
 {
     public function __construct(
         private MessageBusInterface $messageBus,
+        private TaskRepositoryInterface $taskRepository,
     ) {
     }
 
@@ -53,5 +56,29 @@ final class TaskController
                 'title' => $title
             ],
             Response::HTTP_CREATED);
+    }
+
+    #[Route('/tasks/{id}', name: 'task_show', methods: ['GET'])]
+    public function show(string $id): JsonResponse
+    {
+        try {
+            $task = $this->taskRepository->get($id);
+        } catch (TaskNotFoundException) {
+            return new JsonResponse(
+                ['error' => "Task with ID {$id} not found."],
+                Response::HTTP_NOT_FOUND);
+        }
+
+        return new JsonResponse(
+            [
+                'id' => $task->getId(),
+                'title' => $task->getTitle(),
+                'status' => $task->getStatus()->value,
+                'createdAt' => $task->getCreatedAt()->format(DATE_ATOM),
+                'completedAt' => $task->getCompletedAt()?->format(DATE_ATOM),
+            ],
+            Response::HTTP_OK
+        );
+
     }
 }
