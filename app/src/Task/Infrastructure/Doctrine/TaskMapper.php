@@ -18,7 +18,7 @@ final class TaskMapper
         );
     }
 
-    public static function toDomain(TaskEntity $taskEntity): Task
+    public static function fromEntity(TaskEntity $taskEntity): Task
     {
         return Task::rebuild(
             id: $taskEntity->getId(),

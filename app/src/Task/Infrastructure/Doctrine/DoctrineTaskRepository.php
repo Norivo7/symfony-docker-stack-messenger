@@ -7,7 +7,7 @@ use App\Task\Domain\Task;
 use App\Task\Domain\TaskRepositoryInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
-final class DoctrineTaskRepository implements TaskRepositoryInterface
+final readonly class DoctrineTaskRepository implements TaskRepositoryInterface
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
@@ -30,6 +30,6 @@ final class DoctrineTaskRepository implements TaskRepositoryInterface
             throw new \RuntimeException("Task with ID {$taskId} not found.");
         }
 
-        return TaskMapper::toDomain($entity);
+        return TaskMapper::fromEntity($entity);
     }
 }

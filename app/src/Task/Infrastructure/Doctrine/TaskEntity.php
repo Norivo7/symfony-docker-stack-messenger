@@ -17,8 +17,8 @@ class TaskEntity
     #[ORM\Column(type: 'string', length: 255)]
     private string $title;
 
-    #[ORM\Column(type: 'string', length: 32)]
-    private string $status;
+    #[ORM\Column(enumType: TaskStatus::class)]
+    private TaskStatus $status;
 
     #[ORM\Column(type: 'datetime_immutable')]
     private \DateTimeImmutable $createdAt;
@@ -35,7 +35,7 @@ class TaskEntity
     ) {
         $this->id = $id;
         $this->title = $title;
-        $this->status = $status->value;
+        $this->status = $status;
         $this->createdAt = $createdAt;
         $this->completedAt = $completedAt;
     }
@@ -62,12 +62,12 @@ class TaskEntity
 
     public function getStatus(): TaskStatus
     {
-        return TaskStatus::from($this->status);
+        return $this->status;
     }
 
     public function setStatus(TaskStatus $status): void
     {
-        $this->status = $status->value;
+        $this->status = $status;
     }
 
     public function getCreatedAt(): \DateTimeImmutable
