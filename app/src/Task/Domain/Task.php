@@ -29,6 +29,23 @@ final class Task
         );
     }
 
+    public static function rebuild(
+        string $id,
+        string $title,
+        TaskStatus $status,
+        \DateTimeImmutable $createdAt,
+        ?\DateTimeImmutable $completedAt
+    ): self
+    {
+        return new self(
+            id: $id,
+            title: $title,
+            status: TaskStatus::PENDING,
+            createdAt: new \DateTimeImmutable(),
+            completedAt: null,
+        );
+    }
+
     public function complete(): void
     {
         if ($this->status !== TaskStatus::PENDING) {
