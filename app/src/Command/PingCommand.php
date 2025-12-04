@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Command;
@@ -10,6 +11,7 @@ final readonly class PingCommand implements AsyncMessageInterface
 {
     use ContextLoggableTrait;
 
-    public function __construct(private string $payload = 'Ping.') {}
-
+    public function __construct(private string $payload = 'Ping.')
+    {
+    }
 }

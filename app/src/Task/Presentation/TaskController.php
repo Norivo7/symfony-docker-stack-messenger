@@ -8,7 +8,6 @@ use App\Task\Application\CompleteTaskCommand;
 use App\Task\Application\CreateTaskCommand;
 use App\Task\Domain\TaskNotFoundException;
 use App\Task\Domain\TaskRepositoryInterface;
-use LogicException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,15 +31,15 @@ final class TaskController
             $data = json_decode($raw, true, 512, JSON_THROW_ON_ERROR);
         } catch (\JsonException) {
             return new JsonResponse(
-                ['error' => ('Invalid JSON')],
+                ['error' => 'Invalid JSON'],
                 Response::HTTP_BAD_REQUEST);
         }
 
         $title = $data['title'] ?? null;
 
-        if (!is_string($title) || trim($title) === '') {
+        if (!is_string($title) || '' === trim($title)) {
             return new JsonResponse(
-                ['error' => ('Title is required')],
+                ['error' => 'Title is required'],
                 Response::HTTP_BAD_REQUEST);
         }
 
@@ -55,7 +54,7 @@ final class TaskController
         return new JsonResponse(
             [
                 'id' => $id,
-                'title' => $title
+                'title' => $title,
             ],
             Response::HTTP_CREATED);
     }
@@ -81,7 +80,6 @@ final class TaskController
             ],
             Response::HTTP_OK
         );
-
     }
 
     #[Route('/tasks/{id}/complete', name: 'task_complete', methods: ['PATCH'])]
@@ -95,7 +93,7 @@ final class TaskController
             return new JsonResponse(
                 ['error' => "Task with ID {$id} not found."],
                 Response::HTTP_NOT_FOUND);
-        } catch (LogicException $e) { //todo: create domain exception
+        } catch (\LogicException $e) { // todo: create domain exception
             return new JsonResponse(
                 ['error' => $e->getMessage()],
                 Response::HTTP_CONFLICT

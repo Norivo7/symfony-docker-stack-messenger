@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Infrastructure\User;
@@ -17,7 +18,6 @@ final class InMemoryUserRepository implements UserRepositoryInterface
             new User(1, 'john@doe.com', 'John Doe'),
             new User(2, 'jane@doe.com', 'Jane Doe'),
         ];
-
     }
 
     public function findByEmail(string $email): ?User

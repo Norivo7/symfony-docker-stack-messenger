@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Task\Infrastructure\Doctrine;
@@ -19,12 +20,12 @@ final readonly class DoctrineTaskRepository implements TaskRepositoryInterface
     {
         $entity = $this->entityManager->find(TaskEntity::class, $task->getId());
 
-         if (!$entity instanceof TaskEntity) {
+        if (!$entity instanceof TaskEntity) {
             $entity = TaskMapper::toEntity($task);
             $this->entityManager->persist($entity);
-         } else {
+        } else {
             TaskMapper::updateEntity($entity, $task);
-         }
+        }
 
         $this->entityManager->flush();
     }

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Command;
@@ -10,5 +11,7 @@ final readonly class FailingCommand implements AsyncMessageInterface
 {
     use ContextLoggableTrait;
 
-    public function __construct(private string $payload = 'fail') {}
+    public function __construct(private string $payload = 'fail')
+    {
+    }
 }

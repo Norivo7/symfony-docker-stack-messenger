@@ -1,11 +1,12 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Command;
 
 use App\Command\Traits\ContextLoggableTrait;
-use Symfony\Component\Validator\Constraints as Assert;
 use App\Contract\AsyncMessageInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 final readonly class SendEmailCommand implements AsyncMessageInterface
 {
@@ -20,7 +21,7 @@ final readonly class SendEmailCommand implements AsyncMessageInterface
         public string $subject,
 
         #[Assert\NotBlank]
-        public string $content
-    ) {}
-
+        public string $content,
+    ) {
+    }
 }

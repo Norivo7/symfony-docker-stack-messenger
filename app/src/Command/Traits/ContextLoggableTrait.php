@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Command\Traits;
@@ -10,12 +11,11 @@ trait ContextLoggableTrait
         $data = [];
 
         foreach (get_object_vars($this) as $key => $value) {
-            $data[$key] = is_scalar($value) || $value === null
+            $data[$key] = is_scalar($value) || null === $value
                 ? $value
                 : (is_object($value) ? get_class($value) : json_encode($value));
         }
 
         return $data;
     }
-
 }

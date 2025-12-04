@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Controller;
@@ -6,7 +7,6 @@ namespace App\Controller;
 use App\Command\FailingCommand;
 use App\Command\PingCommand;
 use App\Command\SendEmailCommand;
-use App\Command\SendEmailMessage;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -19,6 +19,7 @@ final class HomeController extends AbstractController
     public function messengerPing(MessageBusInterface $messageBus): JsonResponse
     {
         $messageBus->dispatch(new PingCommand('Hello World!'));
+
         return new JsonResponse(['status' => 'Message dispatched']);
     }
 
@@ -28,6 +29,7 @@ final class HomeController extends AbstractController
     {
         $messageBus->dispatch(new PingCommand('Hello World!'),
             [new DelayStamp(5000)]);
+
         return new JsonResponse(['status' => 'Message dispatched']);
     }
 
@@ -35,6 +37,7 @@ final class HomeController extends AbstractController
     public function messengerFail(MessageBusInterface $messageBus): JsonResponse
     {
         $messageBus->dispatch(new FailingCommand());
+
         return new JsonResponse(['status' => 'Message dispatched']);
     }
 
@@ -61,6 +64,4 @@ final class HomeController extends AbstractController
 
         return new JsonResponse(['status' => 'Message dispatched']);
     }
-
-
 }

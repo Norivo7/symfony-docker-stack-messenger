@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Task\Infrastructure\Doctrine;
@@ -31,7 +32,7 @@ class TaskEntity
         string $title,
         TaskStatus $status,
         \DateTimeImmutable $createdAt,
-        ?\DateTimeImmutable $completedAt
+        ?\DateTimeImmutable $completedAt,
     ) {
         $this->id = $id;
         $this->title = $title;
@@ -89,5 +90,4 @@ class TaskEntity
     {
         $this->completedAt = $completedAt;
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Task\Domain;
@@ -16,7 +17,7 @@ final class Task
 
     public static function create(string $id, string $title): self
     {
-        if (empty($title) || trim($title) === '') {
+        if (empty($title) || '' === trim($title)) {
             throw new \RuntimeException('Title cannot be empty');
         }
 
@@ -34,9 +35,8 @@ final class Task
         string $title,
         TaskStatus $status,
         \DateTimeImmutable $createdAt,
-        ?\DateTimeImmutable $completedAt
-    ): self
-    {
+        ?\DateTimeImmutable $completedAt,
+    ): self {
         return new self(
             id: $id,
             title: $title,
@@ -48,7 +48,7 @@ final class Task
 
     public function complete(): void
     {
-        if ($this->status !== TaskStatus::PENDING) {
+        if (TaskStatus::PENDING !== $this->status) {
             throw new \RuntimeException('Only pending tasks can be completed.');
         }
 

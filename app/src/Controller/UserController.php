@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Controller;
@@ -23,6 +24,7 @@ final class UserController extends AbstractController
     public function fetchUser(int $id): JsonResponse
     {
         $data = $this->handle(new GetUserByIdQuery($id));
+
         return $this->json($data);
     }
 }

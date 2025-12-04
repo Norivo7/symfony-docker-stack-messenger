@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Tests\MessageHandler;
@@ -33,6 +34,4 @@ final class PingMessageHandlerTest extends TestCase
 
         $handler($message);
     }
-
-
 }
