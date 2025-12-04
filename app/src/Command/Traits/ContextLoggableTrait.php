@@ -11,9 +11,15 @@ trait ContextLoggableTrait
         $data = [];
 
         foreach (get_object_vars($this) as $key => $value) {
-            $data[$key] = is_scalar($value) || null === $value
-                ? $value
-                : (is_object($value) ? get_class($value) : json_encode($value));
+            if (is_scalar($value) || null === $value) {
+                $data[$key] = $value;
+            }
+            if (is_object($value)) {
+                $data[$key] = get_class($value);
+            }
+            if (!is_object($value)) {
+                $data[$key] = json_encode($value);
+            }
         }
 
         return $data;
