@@ -14,4 +14,5 @@ final readonly class FailingCommand implements AsyncMessageInterface
     public function __construct(private string $payload = 'fail')
     {
     }
+
 }

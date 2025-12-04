@@ -89,10 +89,6 @@ final class TaskController
 
         try {
             $this->messageBus->dispatch($command);
-        } catch (TaskNotFoundException) {
-            return new JsonResponse(
-                ['error' => "Task with ID {$id} not found."],
-                Response::HTTP_NOT_FOUND);
         } catch (\LogicException $e) { // todo: create domain exception
             return new JsonResponse(
                 ['error' => $e->getMessage()],

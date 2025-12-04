@@ -15,11 +15,6 @@ final class UserController extends AbstractController
 {
     use HandleTrait;
 
-    public function __construct(private MessageBusInterface $messageBus)
-    {
-        $this->messageBus = $messageBus;
-    }
-
     #[Route('/user/{id}', name: 'user', methods: ['GET'])]
     public function fetchUser(int $id): JsonResponse
     {

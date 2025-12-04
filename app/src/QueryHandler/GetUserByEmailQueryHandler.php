@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\QueryHandler;
 
+use App\Domain\User\User;
 use App\Domain\User\UserRepositoryInterface;
 use App\Query\GetUserByEmailQuery;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -15,9 +16,16 @@ final readonly class GetUserByEmailQueryHandler
     {
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function __invoke(GetUserByEmailQuery $query): array
     {
         $user = $this->userRepository->findByEmail($query->email);
+
+        if ($user === null) {
+            throw new \RuntimeException("User with email {$query->email} not found.");
+        }
 
         return ['id' => $user->id, 'name' => $user->name, 'email' => $user->email];
     }
