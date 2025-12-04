@@ -28,4 +28,12 @@ final class TaskMapper
             completedAt: $taskEntity->getCompletedAt(),
         );
     }
+
+    public static function updateEntity(TaskEntity $entity, Task $task): void
+    {
+        $entity->setTitle($task->getTitle());
+        $entity->setStatus($task->getStatus());
+        $entity->setCreatedAt($task->getCreatedAt());
+        $entity->setCompletedAt($task->getCompletedAt());
+    }
 }

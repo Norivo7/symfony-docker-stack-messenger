@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Task\Presentation;
 
+use App\Task\Application\CompleteTaskCommand;
 use App\Task\Application\CreateTaskCommand;
 use App\Task\Domain\TaskNotFoundException;
 use App\Task\Domain\TaskRepositoryInterface;
+use LogicException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -73,12 +75,35 @@ final class TaskController
             [
                 'id' => $task->getId(),
                 'title' => $task->getTitle(),
-                'status' => $task->getStatus()->value,
+                'status' => $task->getStatus(),
                 'createdAt' => $task->getCreatedAt()->format(DATE_ATOM),
                 'completedAt' => $task->getCompletedAt()?->format(DATE_ATOM),
             ],
             Response::HTTP_OK
         );
 
+    }
+
+    #[Route('/tasks/{id}/complete', name: 'task_complete', methods: ['PATCH'])]
+    public function complete(string $id): JsonResponse
+    {
+        $command = new CompleteTaskCommand($id);
+
+        try {
+            $this->messageBus->dispatch($command);
+        } catch (TaskNotFoundException) {
+            return new JsonResponse(
+                ['error' => "Task with ID {$id} not found."],
+                Response::HTTP_NOT_FOUND);
+        } catch (LogicException $e) { //todo: create domain exception
+            return new JsonResponse(
+                ['error' => $e->getMessage()],
+                Response::HTTP_CONFLICT
+            );
+        }
+
+        return new JsonResponse(
+            ['message' => "Task with ID {$id} marked as completed."],
+            Response::HTTP_OK);
     }
 }
