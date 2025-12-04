@@ -42,6 +42,8 @@ services:
       - pg_data:/var/lib/postgresql/data
     networks:
       - symfony
+    ports:
+      - "5432:5432"
 
   redis:
     image: redis:alpine
