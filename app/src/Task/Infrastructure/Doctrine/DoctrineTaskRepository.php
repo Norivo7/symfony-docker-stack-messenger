@@ -17,9 +17,15 @@ final readonly class DoctrineTaskRepository implements TaskRepositoryInterface
 
     public function save(Task $task): void
     {
-        $entity = TaskMapper::toEntity($task);
+        $entity = $this->entityManager->find(TaskEntity::class, $task->getId());
 
-        $this->entityManager->persist($entity);
+         if (!$entity instanceof TaskEntity) {
+            $entity = TaskMapper::toEntity($task);
+            $this->entityManager->persist($entity);
+         } else {
+            TaskMapper::updateEntity($entity, $task);
+         }
+
         $this->entityManager->flush();
     }
 

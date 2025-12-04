@@ -40,9 +40,9 @@ final class Task
         return new self(
             id: $id,
             title: $title,
-            status: TaskStatus::PENDING,
-            createdAt: new \DateTimeImmutable(),
-            completedAt: null,
+            status: $status,
+            createdAt: $createdAt,
+            completedAt: $completedAt,
         );
     }
 
