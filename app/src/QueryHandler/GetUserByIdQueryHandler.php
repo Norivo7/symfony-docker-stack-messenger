@@ -6,7 +6,6 @@ namespace App\QueryHandler;
 
 use App\Domain\User\UserRepositoryInterface;
 use App\Query\GetUserByIdQuery;
-use RuntimeException;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
@@ -21,7 +20,7 @@ final readonly class GetUserByIdQueryHandler
         $user = $this->userRepository->findById($query->id);
 
         if (!$user) {
-            throw new RuntimeException("User with ID $query->id not found.");
+            throw new \RuntimeException("User with ID $query->id not found.");
         }
 
         return ['id' => $user->id, 'name' => $user->name, 'email' => $user->email];

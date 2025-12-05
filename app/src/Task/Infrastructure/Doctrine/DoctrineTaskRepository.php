@@ -40,4 +40,13 @@ final readonly class DoctrineTaskRepository implements TaskRepositoryInterface
 
         return TaskMapper::fromEntity($entity);
     }
+
+    public function delete(Task $task): void
+    {
+        // maybe-todo: get the entity reference instead of find
+        $entity = $this->entityManager->find(TaskEntity::class, $task->getId());
+
+        $this->entityManager->remove($entity);
+        $this->entityManager->flush();
+    }
 }

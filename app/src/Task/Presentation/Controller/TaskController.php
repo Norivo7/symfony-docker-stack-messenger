@@ -6,12 +6,17 @@ namespace App\Task\Presentation\Controller;
 
 use App\Task\Application\Messenger\CompleteTaskCommand;
 use App\Task\Application\Messenger\CreateTaskCommand;
+use App\Task\Application\Messenger\DeleteTaskCommand;
 use App\Task\Application\Messenger\RenameTaskCommand;
 use App\Task\Domain\Contracts\TaskRepositoryInterface;
+use App\Task\Domain\Exception\CannotDeleteCompletedTaskException;
+use App\Task\Domain\Exception\InvalidTaskTitleException;
+use App\Task\Domain\Exception\TaskAlreadyCompletedException;
 use App\Task\Domain\Exception\TaskNotFoundException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -90,11 +95,30 @@ final readonly class TaskController
 
         try {
             $this->messageBus->dispatch($command);
-        } catch (\LogicException $e) { // todo: create domain exception
-            return new JsonResponse(
-                ['error' => $e->getMessage()],
-                Response::HTTP_CONFLICT
-            );
+        } catch (HandlerFailedException $e) {
+            $previous = $e->getPrevious();
+
+            if ($previous instanceof TaskNotFoundException) {
+                return new JsonResponse(
+                    ['error' => $previous->getMessage()],
+                    Response::HTTP_NOT_FOUND);
+            }
+
+            if ($previous instanceof TaskAlreadyCompletedException) {
+                return new JsonResponse(
+                    ['error' => $previous->getMessage()],
+                    Response::HTTP_CONFLICT
+                );
+            }
+
+            if ($previous instanceof CannotDeleteCompletedTaskException) {
+                return new JsonResponse(
+                    ['error' => $previous->getMessage()],
+                    Response::HTTP_CONFLICT
+                );
+            }
+
+            throw $e;
         }
 
         return new JsonResponse(
@@ -106,6 +130,7 @@ final readonly class TaskController
     public function rename(string $id, Request $request): JsonResponse
     {
         $raw = $request->getContent();
+
         try {
             $data = json_decode($raw, true, 512, JSON_THROW_ON_ERROR);
         } catch (\JsonException) {
@@ -126,14 +151,57 @@ final readonly class TaskController
 
         try {
             $this->messageBus->dispatch($command);
-        } catch (\DomainException $e) {
-            return new JsonResponse(
-                ['error' => $e->getMessage()],
-                Response::HTTP_CONFLICT);
+        } catch (HandlerFailedException $e) {
+            $previous = $e->getPrevious();
+
+            if ($previous instanceof InvalidTaskTitleException) {
+                return new JsonResponse(
+                    ['error' => $previous->getMessage()],
+                    Response::HTTP_BAD_REQUEST);
+            }
+            if ($previous instanceof TaskNotFoundException) {
+                return new JsonResponse(
+                    ['error' => $previous->getMessage()],
+                    Response::HTTP_NOT_FOUND);
+            }
+
+            throw $e;
         }
 
         return new JsonResponse(
             ['message' => "Task with ID $id renamed to '$newTitle'."],
             Response::HTTP_OK);
+    }
+
+    #[Route('/tasks/{id}', name: 'task_delete', methods: ['DELETE'])]
+    public function delete(string $id): JsonResponse
+    {
+        $command = new DeleteTaskCommand($id);
+
+        try {
+            $this->messageBus->dispatch($command);
+        } catch (HandlerFailedException $e) {
+            $previous = $e->getPrevious();
+
+            if ($previous instanceof CannotDeleteCompletedTaskException) {
+                return new JsonResponse(
+                    ['error' => $previous->getMessage()],
+                    Response::HTTP_CONFLICT
+                );
+            }
+
+            if ($previous instanceof TaskNotFoundException) {
+                return new JsonResponse(
+                    ['error' => $previous->getMessage()],
+                    Response::HTTP_NOT_FOUND
+                );
+            }
+
+            throw $e;
+        }
+
+        return new JsonResponse(
+            ['message' => null],
+            Response::HTTP_NO_CONTENT);
     }
 }

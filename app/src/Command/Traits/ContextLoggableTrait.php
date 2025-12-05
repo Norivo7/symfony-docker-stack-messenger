@@ -6,7 +6,6 @@ namespace App\Command\Traits;
 
 trait ContextLoggableTrait
 {
-
     /**
      * @return array<string, mixed>
      */

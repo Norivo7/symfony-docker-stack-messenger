@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Task\Domain\Entity;
 
 use App\Task\Domain\Enums\TaskStatus;
+use App\Task\Domain\Exception\CannotDeleteCompletedTaskException;
+use App\Task\Domain\Exception\InvalidTaskTitleException;
 
 final class Task
 {
@@ -45,7 +47,7 @@ final class Task
     public static function create(string $id, string $title): self
     {
         if (empty($title) || '' === trim($title)) {
-            throw new \RuntimeException('Title cannot be empty');
+            throw new InvalidTaskTitleException('Title cannot be empty');
         }
 
         return new self(
@@ -86,11 +88,17 @@ final class Task
     public function rename(string $title): void
     {
         $newTitle = trim($title);
-        if ($newTitle === '') {
-            throw new \RuntimeException('Title cannot be empty');
+        if ('' === $newTitle) {
+            throw new InvalidTaskTitleException('Title cannot be empty');
         }
 
         $this->title = $newTitle;
     }
 
+    public function assertCanBeDeleted(): void
+    {
+        if (TaskStatus::DONE === $this->status) {
+            throw new CannotDeleteCompletedTaskException('Completed task cannot be deleted.');
+        }
+    }
 }

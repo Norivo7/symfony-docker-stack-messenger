@@ -11,4 +11,6 @@ interface TaskRepositoryInterface
     public function save(Task $task): void;
 
     public function get(string $taskId): Task;
+
+    public function delete(Task $task): void;
 }
