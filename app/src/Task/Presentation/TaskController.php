@@ -6,6 +6,7 @@ namespace App\Task\Presentation;
 
 use App\Task\Application\CompleteTaskCommand;
 use App\Task\Application\CreateTaskCommand;
+use App\Task\Application\RenameTaskCommand;
 use App\Task\Domain\TaskNotFoundException;
 use App\Task\Domain\TaskRepositoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -14,7 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
-final class TaskController
+final readonly class TaskController
 {
     public function __construct(
         private MessageBusInterface $messageBus,
@@ -98,6 +99,41 @@ final class TaskController
 
         return new JsonResponse(
             ['message' => "Task with ID {$id} marked as completed."],
+            Response::HTTP_OK);
+    }
+
+    #[Route('/tasks/{id}', name: 'task_rename', methods: ['PATCH'])]
+    public function rename(string $id, Request $request): JsonResponse
+    {
+        $raw = $request->getContent();
+        try {
+            $data = json_decode($raw, true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            return new JsonResponse(
+                ['error' => 'Invalid JSON'],
+                Response::HTTP_BAD_REQUEST);
+        }
+
+        $newTitle = $data['title'] ?? null;
+
+        if (!is_string($newTitle) || '' === trim($newTitle)) {
+            return new JsonResponse(
+                ['error' => 'Title is required'],
+                Response::HTTP_BAD_REQUEST);
+        }
+
+        $command = new RenameTaskCommand($id, $newTitle);
+
+        try {
+            $this->messageBus->dispatch($command);
+        } catch (\DomainException $e) {
+            return new JsonResponse(
+                ['error' => $e->getMessage()],
+                Response::HTTP_CONFLICT);
+        }
+
+        return new JsonResponse(
+            ['message' => "Task with ID $id renamed to '$newTitle'."],
             Response::HTTP_OK);
     }
 }
