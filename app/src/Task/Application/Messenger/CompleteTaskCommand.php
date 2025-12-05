@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Task\Application;
+namespace App\Task\Application\Messenger;
 
 final readonly class CompleteTaskCommand
 {

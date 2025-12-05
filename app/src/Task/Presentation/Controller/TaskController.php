@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Task\Presentation;
+namespace App\Task\Presentation\Controller;
 
-use App\Task\Application\CompleteTaskCommand;
-use App\Task\Application\CreateTaskCommand;
-use App\Task\Application\RenameTaskCommand;
-use App\Task\Domain\TaskNotFoundException;
-use App\Task\Domain\TaskRepositoryInterface;
+use App\Task\Application\Messenger\CompleteTaskCommand;
+use App\Task\Application\Messenger\CreateTaskCommand;
+use App\Task\Application\Messenger\RenameTaskCommand;
+use App\Task\Domain\Contracts\TaskRepositoryInterface;
+use App\Task\Domain\Exception\TaskNotFoundException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

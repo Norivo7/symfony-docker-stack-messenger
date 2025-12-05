@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Task\Infrastructure\Doctrine;
 
-use App\Task\Domain\Task;
+use App\Task\Domain\Entity\Task;
 
 final class TaskMapper
 {

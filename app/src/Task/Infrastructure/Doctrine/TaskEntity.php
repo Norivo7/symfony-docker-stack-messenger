@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Task\Infrastructure\Doctrine;
 
-use App\Task\Domain\TaskStatus;
+use App\Task\Domain\Enums\TaskStatus;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]

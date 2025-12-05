@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Task\Infrastructure\Doctrine;
 
-use App\Task\Domain\Task;
-use App\Task\Domain\TaskNotFoundException;
-use App\Task\Domain\TaskRepositoryInterface;
+use App\Task\Domain\Contracts\TaskRepositoryInterface;
+use App\Task\Domain\Entity\Task;
+use App\Task\Domain\Exception\TaskNotFoundException;
 use Doctrine\ORM\EntityManagerInterface;
 
 final readonly class DoctrineTaskRepository implements TaskRepositoryInterface
