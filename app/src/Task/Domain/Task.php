@@ -8,11 +8,36 @@ final class Task
 {
     private function __construct(
         private readonly string $id,
-        private readonly string $title,
+        private string $title,
         private TaskStatus $status,
         private readonly \DateTimeImmutable $createdAt,
         private ?\DateTimeImmutable $completedAt,
     ) {
+    }
+
+    public function getId(): string
+    {
+        return $this->id;
+    }
+
+    public function getTitle(): string
+    {
+        return $this->title;
+    }
+
+    public function getStatus(): TaskStatus
+    {
+        return $this->status;
+    }
+
+    public function getCreatedAt(): \DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function getCompletedAt(): ?\DateTimeImmutable
+    {
+        return $this->completedAt;
     }
 
     public static function create(string $id, string $title): self
@@ -56,28 +81,14 @@ final class Task
         $this->completedAt = new \DateTimeImmutable();
     }
 
-    public function getId(): string
+    public function rename(string $title): void
     {
-        return $this->id;
+        $newTitle = trim($title);
+        if ($newTitle === '') {
+            throw new \RuntimeException('Title cannot be empty');
+        }
+
+        $this->title = $newTitle;
     }
 
-    public function getTitle(): string
-    {
-        return $this->title;
-    }
-
-    public function getStatus(): TaskStatus
-    {
-        return $this->status;
-    }
-
-    public function getCreatedAt(): \DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function getCompletedAt(): ?\DateTimeImmutable
-    {
-        return $this->completedAt;
-    }
 }
