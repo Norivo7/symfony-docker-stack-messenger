@@ -111,13 +111,6 @@ final readonly class TaskController
                 );
             }
 
-            if ($previous instanceof CannotDeleteCompletedTaskException) {
-                return new JsonResponse(
-                    ['error' => $previous->getMessage()],
-                    Response::HTTP_CONFLICT
-                );
-            }
-
             throw $e;
         }
 

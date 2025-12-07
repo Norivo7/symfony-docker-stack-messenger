@@ -7,6 +7,7 @@ namespace App\Task\Domain\Entity;
 use App\Task\Domain\Enums\TaskStatus;
 use App\Task\Domain\Exception\CannotDeleteCompletedTaskException;
 use App\Task\Domain\Exception\InvalidTaskTitleException;
+use App\Task\Domain\Exception\TaskAlreadyCompletedException;
 
 final class Task
 {
@@ -78,7 +79,7 @@ final class Task
     public function complete(): void
     {
         if (TaskStatus::PENDING !== $this->status) {
-            throw new \RuntimeException('Only pending tasks can be completed.');
+            throw new TaskAlreadyCompletedException('Only pending tasks can be completed.');
         }
 
         $this->status = TaskStatus::DONE;
