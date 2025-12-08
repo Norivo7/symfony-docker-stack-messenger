@@ -22,24 +22,24 @@ framework:
         buses:
             messenger.bus.default:
                 middleware:
-                    - App\Messenger\Middleware\ValidationMiddleware
-                    - App\Messenger\Middleware\ErrorLoggingMiddleware
+                    - App\Shared\Messenger\Middleware\ValidationMiddleware
+                    - App\Shared\Messenger\Middleware\ErrorLoggingMiddleware
 
             messenger.bus.command:
                 middleware:
-                    - App\Messenger\Middleware\ValidationMiddleware
-                    - App\Messenger\Middleware\ErrorLoggingMiddleware
+                    - App\Shared\Messenger\Middleware\ValidationMiddleware
+                    - App\Shared\Messenger\Middleware\ErrorLoggingMiddleware
 
             messenger.bus.query:
                 middleware:
-                    - App\Messenger\Middleware\ValidationMiddleware
-                    - App\Messenger\Middleware\ErrorLoggingMiddleware
+                    - App\Shared\Messenger\Middleware\ValidationMiddleware
+                    - App\Shared\Messenger\Middleware\ErrorLoggingMiddleware
 
         routing:
             Symfony\Component\Mailer\Messenger\SendEmailMessage: async
             Symfony\Component\Notifier\Message\ChatMessage: async
             Symfony\Component\Notifier\Message\SmsMessage: async
-            'App\Command\*': async
+            'App\Ping\Application\Command\*': async
 
             # Route your messages to the transports
             # 'App\Message\YourMessage': async

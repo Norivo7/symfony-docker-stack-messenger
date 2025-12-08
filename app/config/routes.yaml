@@ -1,10 +1,15 @@
-controllers:
-    resource:
-        path: ../src/Controller/
-        namespace: App\Controller
-    type: attribute
 task_controllers:
     resource:
         path: ../src/Task/Presentation/
         namespace: App\Task\Presentation
+    type: attribute
+ping_controllers:
+    resource:
+        path: ../src/Ping/Presentation/
+        namespace: App\Ping\Presentation
+    type: attribute
+user_controllers:
+    resource:
+        path: ../src/User/Presentation/
+        namespace: App\User\Presentation
     type: attribute

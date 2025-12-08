@@ -17,9 +17,15 @@ services:
         resource: '../src/'
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
-    App\Messenger\Middleware\ErrorLoggingMiddleware:
+
+    # Module-specific service configurations
+    # shared
+    App\Shared\Messenger\Middleware\ErrorLoggingMiddleware:
         tags: [messenger.middleware]
-    App\Domain\User\UserRepositoryInterface: '@App\Infrastructure\User\InMemoryUserRepository'
+
+    # user module
+    App\User\Domain\Contracts\UserRepositoryInterface: '@App\User\Infrastructure\InMemory\InMemoryUserRepository'
+
     # task module
     App\Task\Infrastructure\Doctrine\DoctrineTaskRepository:
         arguments:
