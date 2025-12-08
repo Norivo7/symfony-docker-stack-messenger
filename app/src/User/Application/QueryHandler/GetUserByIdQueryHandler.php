@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\User\Application\QueryHandler;
 
 use App\User\Application\Query\GetUserByIdQuery;
-use App\User\Domain\UserRepositoryInterface;
+use App\User\Domain\Contracts\UserRepositoryInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]

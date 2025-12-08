@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\User\Infrastructure;
+namespace App\User\Infrastructure\InMemory;
 
-use App\User\Domain\User;
-use App\User\Domain\UserRepositoryInterface;
+use App\User\Domain\Contracts\UserRepositoryInterface;
+use App\User\Domain\Entity\User;
 
 final class InMemoryUserRepository implements UserRepositoryInterface
 {
