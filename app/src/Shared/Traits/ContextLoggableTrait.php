@@ -21,7 +21,7 @@ trait ContextLoggableTrait
                 $data[$key] = get_class($value);
             }
             if (!is_object($value)) {
-                $data[$key] = json_encode($value);
+                $data[$key] = json_encode($value, JSON_THROW_ON_ERROR);
             }
         }
 
