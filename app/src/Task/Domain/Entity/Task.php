@@ -48,7 +48,7 @@ final class Task
     public static function create(string $id, string $title): self
     {
         if (empty($title) || '' === trim($title)) {
-            throw new InvalidTaskTitleException('Title cannot be empty');
+            throw new InvalidTaskTitleException('Title cannot be empty.');
         }
 
         return new self(
@@ -90,7 +90,7 @@ final class Task
     {
         $newTitle = trim($title);
         if ('' === $newTitle) {
-            throw new InvalidTaskTitleException('Title cannot be empty');
+            throw new InvalidTaskTitleException('Title cannot be empty.');
         }
 
         $this->title = $newTitle;
