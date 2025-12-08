@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\MessageHandler;
 
-use App\Command\FailingCommand;
-use App\CommandHandler\FailingCommandHandler;
+use App\Ping\Application\Command\FailingCommand;
+use App\Ping\Application\CommandHandler\FailingCommandHandler;
 use PHPUnit\Framework\TestCase;
 
 final class FailingMessageHandlerTest extends TestCase

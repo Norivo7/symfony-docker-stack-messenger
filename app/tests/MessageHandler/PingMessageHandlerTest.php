@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\MessageHandler;
 
-use App\Command\PingCommand;
-use App\CommandHandler\PingCommandHandler;
+use App\Ping\Application\Command\PingCommand;
+use App\Ping\Application\CommandHandler\PingCommandHandler;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 

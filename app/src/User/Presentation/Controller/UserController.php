@@ -1,0 +1,24 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\User\Presentation\Controller;
+
+use App\User\Application\Query\GetUserByIdQuery;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Messenger\HandleTrait;
+use Symfony\Component\Routing\Annotation\Route;
+
+final class UserController extends AbstractController
+{
+    use HandleTrait;
+
+    #[Route('/user/{id}', name: 'user', methods: ['GET'])]
+    public function fetchUser(int $id): JsonResponse
+    {
+        $data = $this->handle(new GetUserByIdQuery($id));
+
+        return $this->json($data);
+    }
+}
