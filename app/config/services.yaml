@@ -30,4 +30,4 @@ services:
     App\Task\Infrastructure\Doctrine\DoctrineTaskRepository:
         arguments:
             - '@doctrine.orm.entity_manager'
-    App\Task\TaskRepositoryInterface: '@App\Task\Infrastructure\Doctrine\DoctrineTaskRepository'
+    App\Task\Domain\Contracts\TaskRepositoryInterface: '@App\Task\Infrastructure\Doctrine\DoctrineTaskRepository'
