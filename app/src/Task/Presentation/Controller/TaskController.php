@@ -38,6 +38,7 @@ final class TaskController
     public function list(Request $request): Response
     {
         $statusParam = $request->query->get('status');
+        // todo: move allowed values generation to a dedicated service if used elsewhere
         $cases = json_encode(TaskStatus::cases(), JSON_THROW_ON_ERROR);
         $trimmedCases = trim($cases, '[]');
         $status = null;
