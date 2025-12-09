@@ -12,6 +12,7 @@ final readonly class FailingCommandHandler
 {
     public function __invoke(FailingCommand $message): void
     {
+        // todo: custom Application exception could be used here + catch in middleware to log differently
         throw new \RuntimeException('FailingCommand triggered exception');
     }
 }

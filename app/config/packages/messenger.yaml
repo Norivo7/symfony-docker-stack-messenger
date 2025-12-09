@@ -1,6 +1,6 @@
 framework:
     messenger:
-        default_bus: messenger.bus.default
+        default_bus: messenger.bus.command
 
         failure_transport: failed
 
@@ -20,20 +20,16 @@ framework:
             # sync: 'sync://'
 
         buses:
-            messenger.bus.default:
-                middleware:
-                    - App\Shared\Messenger\Middleware\ValidationMiddleware
-                    - App\Shared\Messenger\Middleware\ErrorLoggingMiddleware
-
             messenger.bus.command:
                 middleware:
                     - App\Shared\Messenger\Middleware\ValidationMiddleware
                     - App\Shared\Messenger\Middleware\ErrorLoggingMiddleware
+                    - App\Shared\Messenger\Middleware\PerformanceMiddleware
 
             messenger.bus.query:
                 middleware:
                     - App\Shared\Messenger\Middleware\ValidationMiddleware
-                    - App\Shared\Messenger\Middleware\ErrorLoggingMiddleware
+                    - App\Shared\Messenger\Middleware\PerformanceMiddleware
 
         routing:
             Symfony\Component\Mailer\Messenger\SendEmailMessage: async

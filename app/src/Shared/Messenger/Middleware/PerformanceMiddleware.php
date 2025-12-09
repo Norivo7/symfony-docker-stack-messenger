@@ -9,9 +9,8 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 
-final readonly class ErrorLoggingMiddleware implements MiddlewareInterface
+final readonly class PerformanceMiddleware implements MiddlewareInterface
 {
-    // todo: separate performance metrics | single responsibility principle
     public function __construct(private LoggerInterface $logger)
     {
     }
@@ -20,15 +19,14 @@ final readonly class ErrorLoggingMiddleware implements MiddlewareInterface
     {
         $messageClass = get_class($envelope->getMessage());
 
-        try {
-            $result = $stack->next()->handle($envelope, $stack);
-        } catch (\Throwable $throwable) {
-            $this->logger->error('Messenger error: '.$throwable->getMessage(), [
-                'exception' => $throwable,
-                'message_class' => $messageClass,
-            ]);
-            throw $throwable;
-        }
+        $start = microtime(true);
+        $result = $stack->next()->handle($envelope, $stack);
+
+        $duration = round((microtime(true) - $start) * 1000, 2);
+        $this->logger->info('Handled message', [
+            'message_class' => $messageClass,
+            'duration_ms' => $duration,
+        ]);
 
         return $result;
     }

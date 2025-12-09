@@ -20,8 +20,14 @@ services:
 
     # Module-specific service configurations
     # shared
+    App\Shared\Messenger\Middleware\ValidationMiddleware:
+        tags: [ messenger.middleware ]
+
     App\Shared\Messenger\Middleware\ErrorLoggingMiddleware:
-        tags: [messenger.middleware]
+        tags: [ messenger.middleware ]
+
+    App\Shared\Messenger\Middleware\PerformanceMiddleware:
+        tags: [ messenger.middleware ]
 
     # user module
     App\User\Domain\Contracts\UserRepositoryInterface: '@App\User\Infrastructure\InMemory\InMemoryUserRepository'
