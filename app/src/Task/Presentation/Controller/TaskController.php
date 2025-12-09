@@ -8,7 +8,10 @@ use App\Task\Application\Messenger\CompleteTaskCommand;
 use App\Task\Application\Messenger\CreateTaskCommand;
 use App\Task\Application\Messenger\DeleteTaskCommand;
 use App\Task\Application\Messenger\RenameTaskCommand;
+use App\Task\Application\Query\ListTaskQuery;
 use App\Task\Domain\Contracts\TaskRepositoryInterface;
+use App\Task\Domain\Entity\Task;
+use App\Task\Domain\Enums\TaskStatus;
 use App\Task\Domain\Exception\CannotDeleteCompletedTaskException;
 use App\Task\Domain\Exception\InvalidTaskTitleException;
 use App\Task\Domain\Exception\TaskAlreadyCompletedException;
@@ -17,15 +20,58 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
+use Symfony\Component\Messenger\HandleTrait;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
-final readonly class TaskController
+final class TaskController
 {
+    use HandleTrait;
+
     public function __construct(
         private MessageBusInterface $messageBus,
-        private TaskRepositoryInterface $taskRepository,
-    ) {
+        private readonly TaskRepositoryInterface $taskRepository)
+    {
+    }
+
+    #[Route('/tasks', name: 'task_list', methods: ['GET'])]
+    public function list(Request $request): Response
+    {
+        $statusParam = $request->query->get('status');
+        $cases = json_encode(TaskStatus::cases(), JSON_THROW_ON_ERROR);
+        $trimmedCases = trim($cases, '[]');
+        $status = null;
+        if (null !== $statusParam) {
+            try {
+                $status = TaskStatus::from($statusParam);
+            } catch (\ValueError) {
+                return new JsonResponse(
+                    ['error' => 'Invalid status filter, allowed values are: '.$trimmedCases],
+                    Response::HTTP_BAD_REQUEST
+                );
+            }
+        }
+
+        $query = new ListTaskQuery($status);
+
+        /** @var array<Task> $tasks */
+        $tasks = $this->handle($query);
+
+        $result = array_map(
+            static fn (Task $task) => [
+                'id' => $task->getId(),
+                'title' => $task->getTitle(),
+                'status' => $task->getStatus(),
+                'createdAt' => $task->getCreatedAt()->format(DATE_ATOM),
+                'completedAt' => $task->getCompletedAt()?->format(DATE_ATOM),
+            ],
+            $tasks
+        );
+
+        return new JsonResponse(
+            $result,
+            Response::HTTP_OK
+        );
     }
 
     #[Route('/tasks', name: 'task_create', methods: ['POST'])]

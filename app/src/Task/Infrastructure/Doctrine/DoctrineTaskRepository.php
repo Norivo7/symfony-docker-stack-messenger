@@ -49,4 +49,26 @@ final readonly class DoctrineTaskRepository implements TaskRepositoryInterface
         $this->entityManager->remove($entity);
         $this->entityManager->flush();
     }
+
+    public function getAll(): array
+    {
+        $this->entityManager->getRepository(TaskEntity::class);
+        $entities = $this->entityManager->getRepository(TaskEntity::class)->findAll();
+
+        return array_map(
+            static fn (TaskEntity $entity) => TaskMapper::fromEntity($entity),
+            $entities
+        );
+    }
+
+    public function findByStatus(string $status): array
+    {
+        $this->entityManager->getRepository(TaskEntity::class);
+        $entities = $this->entityManager->getRepository(TaskEntity::class)->findBy(['status' => $status]);
+
+        return array_map(
+            static fn (TaskEntity $entity) => TaskMapper::fromEntity($entity),
+            $entities
+        );
+    }
 }

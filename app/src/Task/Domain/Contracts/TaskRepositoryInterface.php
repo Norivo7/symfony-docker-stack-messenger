@@ -13,4 +13,14 @@ interface TaskRepositoryInterface
     public function get(string $taskId): Task;
 
     public function delete(Task $task): void;
+
+    /**
+     * @return Task[]
+     */
+    public function getAll(): array;
+
+    /**
+     * @return Task[]
+     */
+    public function findByStatus(string $status): array;
 }
