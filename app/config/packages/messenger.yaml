@@ -14,10 +14,9 @@ framework:
                     delay: 1000
                     multiplier: 2
                     max_delay: 10000
-
+            sync: 'sync://'
             failed: 'doctrine://default?queue_name=failed'
 #            failed: 'redis://redis:6379/failed'
-            # sync: 'sync://'
 
         buses:
             messenger.bus.command:

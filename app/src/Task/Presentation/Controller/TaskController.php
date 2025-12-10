@@ -7,6 +7,7 @@ namespace App\Task\Presentation\Controller;
 use App\Task\Application\Messenger\Command\CompleteTaskCommand;
 use App\Task\Application\Messenger\Command\CreateTaskCommand;
 use App\Task\Application\Messenger\Command\DeleteTaskCommand;
+use App\Task\Application\Messenger\Command\InitiateTaskExportCommand;
 use App\Task\Application\Messenger\Command\RenameTaskCommand;
 use App\Task\Application\Query\ListTaskQuery;
 use App\Task\Application\View\TaskSerializer;
@@ -230,5 +231,21 @@ final class TaskController
         return new JsonResponse(
             ['message' => null],
             Response::HTTP_NO_CONTENT);
+    }
+
+    #[Route('/tasks/export', name: 'task_export', methods: ['POST'])]
+    public function export(Request $request, string $format = 'csv'): Response
+    {
+        $criteria = $this->criteriaFactory->createFromRequest($request);
+
+        try {
+            $result = $this->handle(new InitiateTaskExportCommand($criteria, $format));
+        } catch (HandlerFailedException $e) {
+            $previous = $e->getPrevious();
+
+            throw $e;
+        }
+
+        return $result;
     }
 }
