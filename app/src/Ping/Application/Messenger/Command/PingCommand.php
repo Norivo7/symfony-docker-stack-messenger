@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Ping\Application\Command;
+namespace App\Ping\Application\Messenger\Command;
 
 use App\Shared\Contract\AsyncMessageInterface;
 use App\Shared\Traits\ContextLoggableTrait;

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Ping\Presentation\Controller;
 
-use App\Ping\Application\Command\FailingCommand;
-use App\Ping\Application\Command\PingCommand;
+use App\Ping\Application\Messenger\Command\FailingCommand;
+use App\Ping\Application\Messenger\Command\PingCommand;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Messenger\MessageBusInterface;

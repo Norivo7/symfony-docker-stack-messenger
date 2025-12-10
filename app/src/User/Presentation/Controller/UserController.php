@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\User\Presentation\Controller;
 
-use App\Ping\Application\Command\SendEmailCommand;
+use App\Ping\Application\Messenger\Command\SendEmailCommand;
 use App\User\Application\Query\GetUserByIdQuery;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;

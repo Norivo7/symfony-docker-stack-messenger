@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Ping\Application\CommandHandler;
+namespace App\Ping\Application\Messenger\CommandHandler;
 
-use App\Ping\Application\Command\PingCommand;
+use App\Ping\Application\Messenger\Command\PingCommand;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 

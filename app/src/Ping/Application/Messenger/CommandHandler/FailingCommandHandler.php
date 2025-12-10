@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Ping\Application\CommandHandler;
+namespace App\Ping\Application\Messenger\CommandHandler;
 
-use App\Ping\Application\Command\FailingCommand;
+use App\Ping\Application\Messenger\Command\FailingCommand;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]

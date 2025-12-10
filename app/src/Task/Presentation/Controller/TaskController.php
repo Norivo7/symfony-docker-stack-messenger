@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Task\Presentation\Controller;
 
-use App\Task\Application\Messenger\CompleteTaskCommand;
-use App\Task\Application\Messenger\CreateTaskCommand;
-use App\Task\Application\Messenger\DeleteTaskCommand;
-use App\Task\Application\Messenger\RenameTaskCommand;
+use App\Task\Application\Messenger\Command\CompleteTaskCommand;
+use App\Task\Application\Messenger\Command\CreateTaskCommand;
+use App\Task\Application\Messenger\Command\DeleteTaskCommand;
+use App\Task\Application\Messenger\Command\RenameTaskCommand;
 use App\Task\Application\Query\ListTaskQuery;
 use App\Task\Application\View\TaskSerializer;
 use App\Task\Domain\Contracts\TaskRepositoryInterface;

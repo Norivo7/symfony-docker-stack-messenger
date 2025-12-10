@@ -2,24 +2,25 @@
 
 declare(strict_types=1);
 
-namespace App\Task\Application\Messenger;
+namespace App\Task\Application\Messenger\Handler;
 
+use App\Task\Application\Messenger\Command\CompleteTaskCommand;
 use App\Task\Domain\Contracts\TaskRepositoryInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
-final readonly class RenameTaskHandler
+final readonly class CompleteTaskHandler
 {
     public function __construct(
         private TaskRepositoryInterface $taskRepository,
     ) {
     }
 
-    public function __invoke(RenameTaskCommand $command): void
+    public function __invoke(CompleteTaskCommand $command): void
     {
         $task = $this->taskRepository->get($command->id);
 
-        $task->rename($command->title);
+        $task->complete();
 
         $this->taskRepository->save($task);
     }

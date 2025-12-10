@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Task\Application\Messenger;
+namespace App\Task\Application\Messenger\Handler;
 
+use App\Task\Application\Messenger\Command\CreateTaskCommand;
 use App\Task\Domain\Contracts\TaskRepositoryInterface;
 use App\Task\Domain\Entity\Task;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;

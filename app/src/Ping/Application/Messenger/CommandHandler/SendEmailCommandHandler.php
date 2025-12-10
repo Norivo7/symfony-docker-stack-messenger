@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Ping\Application\CommandHandler;
+namespace App\Ping\Application\Messenger\CommandHandler;
 
-use App\Ping\Application\Command\SendEmailCommand;
+use App\Ping\Application\Messenger\Command\SendEmailCommand;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 
