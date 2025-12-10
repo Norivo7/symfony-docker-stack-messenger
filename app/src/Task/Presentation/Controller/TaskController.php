@@ -8,6 +8,7 @@ use App\Task\Application\Messenger\CompleteTaskCommand;
 use App\Task\Application\Messenger\CreateTaskCommand;
 use App\Task\Application\Messenger\DeleteTaskCommand;
 use App\Task\Application\Messenger\RenameTaskCommand;
+use App\Task\Application\Query\Criteria\TaskSearchCriteria;
 use App\Task\Application\Query\ListTaskQuery;
 use App\Task\Domain\Contracts\TaskRepositoryInterface;
 use App\Task\Domain\Entity\Task;
@@ -38,31 +39,68 @@ final class TaskController
     public function list(Request $request): Response
     {
         $statusParam = $request->query->get('status');
-        // todo: move allowed values generation to a dedicated service if used elsewhere
-        $cases = json_encode(TaskStatus::cases(), JSON_THROW_ON_ERROR);
-        $trimmedCases = trim($cases, '[]');
+        $createdFromParam = $request->query->get('createdFrom');
+        $createdToParam = $request->query->get('createdTo');
+
         $status = null;
         if (null !== $statusParam) {
             try {
                 $status = TaskStatus::from($statusParam);
             } catch (\ValueError) {
+                // todo: move allowed values generation to a dedicated service if used elsewhere
+                $allowedStatuses = array_map(
+                    static fn (TaskStatus $case) => $case->value,
+                    TaskStatus::cases()
+                );
+
                 return new JsonResponse(
-                    ['error' => 'Invalid status filter, allowed values are: '.$trimmedCases],
+                    ['error' => 'Invalid status filter, allowed values are: '.implode(', ', $allowedStatuses)],
                     Response::HTTP_BAD_REQUEST
                 );
             }
         }
 
-        $query = new ListTaskQuery($status);
+        $createdFrom = null;
+        if (null !== $createdFromParam) {
+            try {
+                $createdFrom = new \DateTimeImmutable($createdFromParam);
+            } catch (\Exception) {
+                return new JsonResponse(
+                    ['error' => 'Invalid createdFrom date. Expected ISO format.'],
+                    Response::HTTP_BAD_REQUEST
+                );
+            }
+        }
+
+        $createdTo = null;
+        if (null !== $createdToParam) {
+            try {
+                $createdTo = new \DateTimeImmutable($createdToParam);
+            } catch (\Exception) {
+                return new JsonResponse(
+                    ['error' => 'Invalid createdTo date. Expected ISO format.'],
+                    Response::HTTP_BAD_REQUEST
+                );
+            }
+        }
+
+        $criteria = new TaskSearchCriteria(
+            status: $status,
+            createdFrom: $createdFrom,
+            createdTo: $createdTo,
+        );
+
+        $query = new ListTaskQuery($criteria);
 
         /** @var array<Task> $tasks */
         $tasks = $this->handle($query);
 
+        // todo: use a proper serializer
         $result = array_map(
             static fn (Task $task) => [
                 'id' => $task->getId(),
                 'title' => $task->getTitle(),
-                'status' => $task->getStatus(),
+                'status' => $task->getStatus()->value,
                 'createdAt' => $task->getCreatedAt()->format(DATE_ATOM),
                 'completedAt' => $task->getCompletedAt()?->format(DATE_ATOM),
             ],

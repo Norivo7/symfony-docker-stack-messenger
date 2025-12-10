@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Task\Application\Query;
 
-use App\Task\Domain\Enums\TaskStatus;
+use App\Task\Application\Query\Criteria\TaskSearchCriteria;
 
 final readonly class ListTaskQuery
 {
-    public function __construct(public ?TaskStatus $status = null)
-    {
+    public function __construct(
+        public TaskSearchCriteria $criteria,
+    ) {
     }
 }

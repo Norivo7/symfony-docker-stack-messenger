@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Task\Domain\Contracts;
 
+use App\Task\Application\Query\Criteria\TaskSearchCriteria;
 use App\Task\Domain\Entity\Task;
 
 interface TaskRepositoryInterface
@@ -22,5 +23,5 @@ interface TaskRepositoryInterface
     /**
      * @return Task[]
      */
-    public function findByStatus(string $status): array;
+    public function search(TaskSearchCriteria $criteria): array;
 }

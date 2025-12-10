@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Task\Infrastructure\Doctrine;
 
+use App\Task\Application\Query\Criteria\TaskSearchCriteria;
 use App\Task\Domain\Contracts\TaskRepositoryInterface;
 use App\Task\Domain\Entity\Task;
 use App\Task\Domain\Exception\TaskNotFoundException;
@@ -61,10 +62,32 @@ final readonly class DoctrineTaskRepository implements TaskRepositoryInterface
         );
     }
 
-    public function findByStatus(string $status): array
+    public function search(TaskSearchCriteria $criteria): array
     {
-        $this->entityManager->getRepository(TaskEntity::class);
-        $entities = $this->entityManager->getRepository(TaskEntity::class)->findBy(['status' => $status]);
+        $queryBuilder = $this->entityManager
+            ->getRepository(TaskEntity::class)
+            ->createQueryBuilder('task')
+            ->orderBy('task.createdAt', 'DESC');
+
+        if (null !== $criteria->status) {
+            $queryBuilder
+                ->andWhere('task.status = :status')
+                ->setParameter('status', $criteria->status->value);
+        }
+
+        if (null !== $criteria->createdFrom) {
+            $queryBuilder
+                ->andWhere('task.createdAt >= :createdFrom')
+                ->setParameter('createdFrom', $criteria->createdFrom);
+        }
+
+        if (null !== $criteria->createdTo) {
+            $queryBuilder
+                ->andWhere('task.createdAt <= :createdTo')
+                ->setParameter('createdTo', $criteria->createdTo);
+        }
+
+        $entities = $queryBuilder->getQuery()->getResult();
 
         return array_map(
             static fn (TaskEntity $entity) => TaskMapper::fromEntity($entity),
