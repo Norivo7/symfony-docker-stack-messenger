@@ -8,15 +8,16 @@ use App\Task\Application\Messenger\CompleteTaskCommand;
 use App\Task\Application\Messenger\CreateTaskCommand;
 use App\Task\Application\Messenger\DeleteTaskCommand;
 use App\Task\Application\Messenger\RenameTaskCommand;
-use App\Task\Application\Query\Criteria\TaskSearchCriteria;
 use App\Task\Application\Query\ListTaskQuery;
+use App\Task\Application\View\TaskSerializer;
 use App\Task\Domain\Contracts\TaskRepositoryInterface;
 use App\Task\Domain\Entity\Task;
-use App\Task\Domain\Enums\TaskStatus;
 use App\Task\Domain\Exception\CannotDeleteCompletedTaskException;
 use App\Task\Domain\Exception\InvalidTaskTitleException;
 use App\Task\Domain\Exception\TaskAlreadyCompletedException;
 use App\Task\Domain\Exception\TaskNotFoundException;
+use App\Task\Presentation\Http\Exception\InvalidTaskFilterException;
+use App\Task\Presentation\Http\TaskSearchCriteriaFactory;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,81 +32,29 @@ final class TaskController
 
     public function __construct(
         private MessageBusInterface $messageBus,
-        private readonly TaskRepositoryInterface $taskRepository)
-    {
+        private readonly TaskRepositoryInterface $taskRepository,
+        private readonly TaskSearchCriteriaFactory $criteriaFactory,
+        private readonly TaskSerializer $taskSerializer,
+    ) {
     }
 
     #[Route('/tasks', name: 'task_list', methods: ['GET'])]
-    public function list(Request $request): Response
+    public function list(Request $request): JsonResponse
     {
-        $statusParam = $request->query->get('status');
-        $createdFromParam = $request->query->get('createdFrom');
-        $createdToParam = $request->query->get('createdTo');
-
-        $status = null;
-        if (null !== $statusParam) {
-            try {
-                $status = TaskStatus::from($statusParam);
-            } catch (\ValueError) {
-                // todo: move allowed values generation to a dedicated service if used elsewhere
-                $allowedStatuses = array_map(
-                    static fn (TaskStatus $case) => $case->value,
-                    TaskStatus::cases()
-                );
-
-                return new JsonResponse(
-                    ['error' => 'Invalid status filter, allowed values are: '.implode(', ', $allowedStatuses)],
-                    Response::HTTP_BAD_REQUEST
-                );
-            }
+        try {
+            $criteria = $this->criteriaFactory->createFromRequest($request);
+        } catch (InvalidTaskFilterException $e) {
+            return new JsonResponse(
+                ['error' => $e->getMessage()],
+                Response::HTTP_BAD_REQUEST
+            );
         }
-
-        $createdFrom = null;
-        if (null !== $createdFromParam) {
-            try {
-                $createdFrom = new \DateTimeImmutable($createdFromParam);
-            } catch (\Exception) {
-                return new JsonResponse(
-                    ['error' => 'Invalid createdFrom date. Expected ISO format.'],
-                    Response::HTTP_BAD_REQUEST
-                );
-            }
-        }
-
-        $createdTo = null;
-        if (null !== $createdToParam) {
-            try {
-                $createdTo = new \DateTimeImmutable($createdToParam);
-            } catch (\Exception) {
-                return new JsonResponse(
-                    ['error' => 'Invalid createdTo date. Expected ISO format.'],
-                    Response::HTTP_BAD_REQUEST
-                );
-            }
-        }
-
-        $criteria = new TaskSearchCriteria(
-            status: $status,
-            createdFrom: $createdFrom,
-            createdTo: $createdTo,
-        );
-
         $query = new ListTaskQuery($criteria);
 
         /** @var array<Task> $tasks */
         $tasks = $this->handle($query);
 
-        // todo: use a proper serializer
-        $result = array_map(
-            static fn (Task $task) => [
-                'id' => $task->getId(),
-                'title' => $task->getTitle(),
-                'status' => $task->getStatus()->value,
-                'createdAt' => $task->getCreatedAt()->format(DATE_ATOM),
-                'completedAt' => $task->getCompletedAt()?->format(DATE_ATOM),
-            ],
-            $tasks
-        );
+        $result = $this->taskSerializer->serializeList($tasks);
 
         return new JsonResponse(
             $result,
