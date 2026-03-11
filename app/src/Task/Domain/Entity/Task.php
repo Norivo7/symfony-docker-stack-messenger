@@ -54,7 +54,7 @@ final class Task
         return new self(
             id: $id,
             title: $title,
-            status: TaskStatus::PENDING,
+            status: TaskStatus::TODO,
             createdAt: new \DateTimeImmutable(),
             completedAt: null,
         );
@@ -78,8 +78,8 @@ final class Task
 
     public function complete(): void
     {
-        if (TaskStatus::PENDING !== $this->status) {
-            throw new TaskAlreadyCompletedException('Only pending tasks can be completed.');
+        if (TaskStatus::TODO !== $this->status) {
+            throw new TaskAlreadyCompletedException('Only todo tasks can be completed.');
         }
 
         $this->status = TaskStatus::DONE;
