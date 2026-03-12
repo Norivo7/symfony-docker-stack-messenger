@@ -66,8 +66,6 @@ final readonly class DoctrineUserRepository implements UserRepositoryInterface
             email: $entity->getEmail(),
             name: $entity->getName(),
         );
-
-
     }
 
     public function flush(): void

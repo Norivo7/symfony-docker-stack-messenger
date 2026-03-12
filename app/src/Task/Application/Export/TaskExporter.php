@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Task\Application\Export;
@@ -10,8 +11,6 @@ final readonly class TaskExporter
 {
     public function export(TaskSearchCriteria $criteria, string $format): Response
     {
-
         return new Response();
     }
-
 }

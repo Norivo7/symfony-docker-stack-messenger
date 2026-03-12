@@ -65,7 +65,6 @@ final class Task
         ?string $description,
         ?int $assignedUserId,
     ): self {
-
         if (empty($title) || '' === trim($title)) {
             throw new InvalidTaskTitleException('Title cannot be empty.');
         }
@@ -132,7 +131,6 @@ final class Task
             newStatus: $newStatus->value,
             occurredAt: new \DateTimeImmutable(),
         ));
-
     }
 
     public function assignToUser(int $userId): void

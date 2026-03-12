@@ -13,5 +13,4 @@ final readonly class InitiateTaskExportCommand
         public string $format = 'csv',
     ) {
     }
-
 }
