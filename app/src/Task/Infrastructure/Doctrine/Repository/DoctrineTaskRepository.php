@@ -2,33 +2,44 @@
 
 declare(strict_types=1);
 
-namespace App\Task\Infrastructure\Doctrine;
+namespace App\Task\Infrastructure\Doctrine\Repository;
 
 use App\Task\Application\Query\Criteria\TaskSearchCriteria;
 use App\Task\Domain\Contracts\TaskRepositoryInterface;
 use App\Task\Domain\Entity\Task;
 use App\Task\Domain\Exception\TaskNotFoundException;
+use App\Task\Infrastructure\Doctrine\Entity\TaskEntity;
+use App\Task\Infrastructure\Doctrine\Mapper\TaskMapper;
 use Doctrine\ORM\EntityManagerInterface;
 
 final readonly class DoctrineTaskRepository implements TaskRepositoryInterface
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
+        private DoctrineTaskEventRepository $taskEventRepository,
     ) {
     }
 
     public function save(Task $task): void
     {
-        $entity = $this->entityManager->find(TaskEntity::class, $task->getId());
+        $this->entityManager->wrapInTransaction(function () use ($task): void {
+            $entity = $this->entityManager->find(TaskEntity::class, $task->getId());
 
-        if (!$entity instanceof TaskEntity) {
-            $entity = TaskMapper::toEntity($task);
-            $this->entityManager->persist($entity);
-        } else {
-            TaskMapper::updateEntity($entity, $task);
-        }
+            if (!$entity instanceof TaskEntity) {
+                $entity = TaskMapper::toEntity($task);
+                $this->entityManager->persist($entity);
+            } else {
+                TaskMapper::updateEntity($entity, $task);
+            }
 
-        $this->entityManager->flush();
+            $events = $task->releaseEvents();
+
+            foreach ($events as $event) {
+                $this->taskEventRepository->append($task->getId(), $event);
+            }
+
+            $this->entityManager->flush();
+        });
     }
 
     public function get(string $taskId): Task
