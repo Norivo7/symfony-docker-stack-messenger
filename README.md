@@ -261,9 +261,9 @@ project.
 stateDiagram-v2
     [*] --> todo
 
-    todo --> in_progress : PATCH /tasks/{id}/status\nstatus=in_progress
-    in_progress --> done : PATCH /tasks/{id}/status\nstatus=done
-    done --> todo : PATCH /tasks/{id}/status\nstatus=todo
+    todo <--> in_progress : PATCH /tasks/{id}/status=in_progress
+    in_progress <--> done : PATCH /tasks/{id}/status=done
+    done <--> todo : PATCH /tasks/{id}/status=todo
 ```
 
 ### 2. Task status update flow
