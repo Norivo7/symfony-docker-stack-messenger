@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\User\Application\Query;
+namespace App\User\Application\Messenger\Query;
 
 final readonly class GetUserByIdQuery
 {

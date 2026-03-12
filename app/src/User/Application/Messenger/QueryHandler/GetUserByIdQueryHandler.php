@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\User\Application\QueryHandler;
+namespace App\User\Application\Messenger\QueryHandler;
 
-use App\User\Application\Query\GetUserByIdQuery;
+use App\User\Application\Messenger\Query\GetUserByIdQuery;
 use App\User\Domain\Contracts\UserRepositoryInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
