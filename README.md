@@ -250,54 +250,73 @@ Current tests cover:
 
 ---
 
-## Architecture Diagram
+## Mermaid Diagrams
 
-``` mermaid
-flowchart LR
+Below are the diagrams that reflect the actual implementation of the
+project.
 
-Controller[HTTP Controller]
-Controller --> CommandBus[Symfony Messenger Command Bus]
-Controller --> QueryBus[Symfony Messenger Query Bus]
-
-CommandBus --> CommandHandler[Command Handlers]
-QueryBus --> QueryHandler[Query Handlers]
-
-CommandHandler --> Domain[Domain Entities]
-QueryHandler --> Repository[Repositories]
-
-Domain --> Events[Domain Events]
-Events --> EventStore[(task_events table)]
-
-Repository --> Database[(PostgreSQL)]
-```
-
-------------------------------------------------------------------------
-
-## Task Lifecycle
+### 1. Task lifecycle
 
 ``` mermaid
 stateDiagram-v2
+    [*] --> todo
 
-[*] --> todo
-
-todo --> in_progress : start task
-in_progress --> done : complete task
-
-done --> todo : reopen task
+    todo --> in_progress : PATCH /tasks/{id}/status\nstatus=in_progress
+    in_progress --> done : PATCH /tasks/{id}/status\nstatus=done
+    done --> todo : PATCH /tasks/{id}/status\nstatus=todo
 ```
 
-------------------------------------------------------------------------
-
-## Task Event Flow
+### 2. Task status update flow
 
 ``` mermaid
 sequenceDiagram
+    participant Client
+    participant Controller as TaskController
+    participant Bus as MessageBus
+    participant Handler as ChangeTaskStatusHandler
+    participant Resolver as TaskStatusStrategyResolver
+    participant Strategy as TaskStatusStrategy
+    participant Repo as DoctrineTaskRepository
+    participant EventRepo as DoctrineTaskEventRepository
+    participant DB as PostgreSQL
 
-Client->>API: POST /tasks
-API->>Domain: Task::create()
-Domain-->>EventStore: TaskCreatedEvent
+    Client->>Controller: PATCH /tasks/{id}/status
+    Controller->>Bus: dispatch(ChangeTaskStatusCommand)
+    Bus->>Handler: ChangeTaskStatusCommand
+    Handler->>Repo: get(taskId)
+    Repo-->>Handler: Task
+    Handler->>Resolver: resolve(status)
+    Resolver-->>Handler: matching strategy
+    Handler->>Strategy: apply(task)
+    Strategy->>Task: changeStatus(...)
+    Handler->>Repo: save(task)
+    Repo->>EventRepo: append(TaskStatusUpdatedEvent)
+    Repo->>DB: update task + flush
+    EventRepo->>DB: persist task event
+    Controller-->>Client: 200 OK
+```
 
-Client->>API: PATCH /tasks/{id}/status
-API->>Domain: changeStatus()
-Domain-->>EventStore: TaskStatusUpdatedEvent
+### 3. User import flow
+
+``` mermaid
+sequenceDiagram
+    participant Client
+    participant Controller as UserController
+    participant Bus as MessageBus
+    participant Handler as ImportUsersHandler
+    participant Api as JsonPlaceholderUserClient
+    participant Repo as DoctrineUserRepository
+    participant DB as PostgreSQL
+
+    Client->>Controller: POST /users/import
+    Controller->>Bus: dispatch(ImportUsersCommand)
+    Bus->>Handler: ImportUsersCommand
+    Handler->>Api: fetchUsers()
+    Api-->>Handler: users[]
+    loop each user
+        Handler->>Repo: save(User)
+    end
+    Handler->>Repo: flush()
+    Repo->>DB: persist/update users
+    Controller-->>Client: 200 OK
 ```
