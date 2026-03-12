@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Task\Application\Messenger\Handler;
 
 use App\Task\Application\Messenger\Command\ChangeTaskStatusCommand;
+use App\Task\Application\Strategy\TaskStatusStrategyResolver;
 use App\Task\Domain\Contracts\TaskRepositoryInterface;
-use App\Task\Domain\Enums\TaskStatus;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
@@ -14,6 +14,7 @@ final readonly class ChangeTaskStatusHandler
 {
     public function __construct(
         private TaskRepositoryInterface $taskRepository,
+        private TaskStatusStrategyResolver $strategyResolver,
     ) {
     }
 
@@ -21,7 +22,8 @@ final readonly class ChangeTaskStatusHandler
     {
         $task = $this->taskRepository->get($command->id);
 
-        $task->changeStatus(TaskStatus::from($command->status));
+        $strategy = $this->strategyResolver->resolve($command->status);
+        $strategy->apply($task);
 
         $this->taskRepository->save($task);
     }
