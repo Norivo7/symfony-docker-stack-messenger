@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Task\Presentation\Controller;
 
-use App\Task\Application\Messenger\Command\CompleteTaskCommand;
+use App\Task\Application\Messenger\Command\AssignTaskToUserCommand;
+use App\Task\Application\Messenger\Command\ChangeTaskStatusCommand;
 use App\Task\Application\Messenger\Command\CreateTaskCommand;
 use App\Task\Application\Messenger\Command\DeleteTaskCommand;
 use App\Task\Application\Messenger\Command\InitiateTaskExportCommand;
@@ -15,8 +16,8 @@ use App\Task\Domain\Contracts\TaskRepositoryInterface;
 use App\Task\Domain\Entity\Task;
 use App\Task\Domain\Exception\CannotDeleteCompletedTaskException;
 use App\Task\Domain\Exception\InvalidTaskTitleException;
-use App\Task\Domain\Exception\TaskAlreadyCompletedException;
 use App\Task\Domain\Exception\TaskNotFoundException;
+use App\Task\Infrastructure\Doctrine\Repository\DoctrineTaskEventRepository;
 use App\Task\Presentation\Http\Exception\InvalidTaskFilterException;
 use App\Task\Presentation\Http\TaskSearchCriteriaFactory;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -36,6 +37,7 @@ final class TaskController
         private readonly TaskRepositoryInterface $taskRepository,
         private readonly TaskSearchCriteriaFactory $criteriaFactory,
         private readonly TaskSerializer $taskSerializer,
+        private readonly DoctrineTaskEventRepository $taskEventStore,
     ) {
     }
 
@@ -77,6 +79,8 @@ final class TaskController
         }
 
         $title = $data['title'] ?? null;
+        $description = $data['description'] ?? null;
+        $assignedUserId = $data['assignedUserId'] ?? null;
 
         if (!is_string($title) || '' === trim($title)) {
             return new JsonResponse(
@@ -84,10 +88,12 @@ final class TaskController
                 Response::HTTP_BAD_REQUEST);
         }
 
+        $title = trim($title);
+
         // todo: use a proper UUID generator
         $id = uniqid('', true);
 
-        $command = new CreateTaskCommand($id, $title);
+        $command = new CreateTaskCommand($id, $title, $description, $assignedUserId);
 
         // todo: handle message bus exceptions, if transport changes to async
         $this->messageBus->dispatch($command);
@@ -96,8 +102,11 @@ final class TaskController
             [
                 'id' => $id,
                 'title' => $title,
+                'description' => $description,
+                'assignedUserId' => $assignedUserId,
             ],
-            Response::HTTP_CREATED);
+            Response::HTTP_CREATED
+        );
     }
 
     #[Route('/tasks/{id}', name: 'task_show', methods: ['GET'])]
@@ -115,7 +124,9 @@ final class TaskController
             [
                 'id' => $task->getId(),
                 'title' => $task->getTitle(),
-                'status' => $task->getStatus(),
+                'description' => $task->getDescription(),
+                'assignedUserId' => $task->getAssignedUserId(),
+                'status' => $task->getStatus()->value,
                 'createdAt' => $task->getCreatedAt()->format(DATE_ATOM),
                 'completedAt' => $task->getCompletedAt()?->format(DATE_ATOM),
             ],
@@ -123,13 +134,38 @@ final class TaskController
         );
     }
 
-    #[Route('/tasks/{id}/complete', name: 'task_complete', methods: ['PATCH'])]
-    public function complete(string $id): JsonResponse
+    #[Route('/tasks/{id}/status', name: 'task_change_status', methods: ['PATCH'])]
+    public function changeStatus(string $id, Request $request): JsonResponse
     {
-        $command = new CompleteTaskCommand($id);
+        $raw = $request->getContent();
+
+        try {
+            $data = json_decode($raw, true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            return new JsonResponse(
+                ['error' => 'Invalid JSON'],
+                Response::HTTP_BAD_REQUEST
+            );
+        }
+
+        $status = $data['status'] ?? null;
+
+        if (!is_string($status)) {
+            return new JsonResponse(
+                ['error' => 'Status is required'],
+                Response::HTTP_BAD_REQUEST
+            );
+        }
+
+        $command = new ChangeTaskStatusCommand($id, $status);
 
         try {
             $this->messageBus->dispatch($command);
+        } catch (\ValueError) {
+            return new JsonResponse(
+                ['error' => 'Invalid status value'],
+                Response::HTTP_BAD_REQUEST
+            );
         } catch (HandlerFailedException $e) {
             $previous = $e->getPrevious();
 
@@ -139,18 +175,11 @@ final class TaskController
                     Response::HTTP_NOT_FOUND);
             }
 
-            if ($previous instanceof TaskAlreadyCompletedException) {
-                return new JsonResponse(
-                    ['error' => $previous->getMessage()],
-                    Response::HTTP_CONFLICT
-                );
-            }
-
             throw $e;
         }
 
         return new JsonResponse(
-            ['message' => "Task with ID {$id} marked as completed."],
+            ['message' => "Task with ID {$id} status updated."],
             Response::HTTP_OK);
     }
 
@@ -231,6 +260,66 @@ final class TaskController
         return new JsonResponse(
             ['message' => null],
             Response::HTTP_NO_CONTENT);
+    }
+
+    #[Route('/tasks/{id}/history', name: 'task_history', methods: ['GET'])]
+    public function history(string $id): JsonResponse
+    {
+        $events = $this->taskEventStore->getByTaskId($id);
+
+        $result = [];
+
+        foreach ($events as $event) {
+            $result[] = [
+                'eventName' => $event->getEventName(),
+                'payload' => $event->getPayload(),
+                'occurredAt' => $event->getOccurredAt()->format(DATE_ATOM),
+            ];
+        }
+
+        return new JsonResponse($result, Response::HTTP_OK);
+    }
+
+    #[Route('/tasks/{id}/assign', name: 'task_assign', methods: ['PATCH'])]
+    public function assign(string $id, Request $request): JsonResponse
+    {
+        try {
+            $data = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            return new JsonResponse(
+                ['error' => 'Invalid JSON'],
+                Response::HTTP_BAD_REQUEST
+            );
+        }
+
+        $userId = $data['userId'] ?? null;
+
+        if (!is_int($userId)) {
+            return new JsonResponse(
+                ['error' => 'userId is required'],
+                Response::HTTP_BAD_REQUEST
+            );
+        }
+
+        try {
+            $this->messageBus->dispatch(new AssignTaskToUserCommand($id, $userId));
+        } catch (HandlerFailedException $e) {
+            $previous = $e->getPrevious();
+
+            if ($previous instanceof TaskNotFoundException) {
+                return new JsonResponse(
+                    ['error' => $previous->getMessage()],
+                    Response::HTTP_NOT_FOUND
+                );
+            }
+
+            throw $e;
+        }
+
+        return new JsonResponse(
+            ['message' => 'Task assigned successfully.'],
+            Response::HTTP_OK
+        );
     }
 
     #[Route('/tasks/export', name: 'task_export', methods: ['POST'])]
