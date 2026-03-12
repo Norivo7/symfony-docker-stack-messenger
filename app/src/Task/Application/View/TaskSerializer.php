@@ -13,6 +13,8 @@ final readonly class TaskSerializer
         return [
             'id' => $task->getId(),
             'title' => $task->getTitle(),
+            'description' => $task->getDescription(),
+            'assignedUserId' => $task->getAssignedUserId(),
             'status' => $task->getStatus()->value,
             'createdAt' => $task->getCreatedAt()->format(DATE_ATOM),
             'completedAt' => $task->getCompletedAt()?->format(DATE_ATOM),

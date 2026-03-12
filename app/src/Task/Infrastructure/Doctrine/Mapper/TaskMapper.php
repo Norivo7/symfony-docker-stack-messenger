@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Task\Infrastructure\Doctrine;
+namespace App\Task\Infrastructure\Doctrine\Mapper;
 
 use App\Task\Domain\Entity\Task;
+use App\Task\Infrastructure\Doctrine\Entity\TaskEntity;
 
 final class TaskMapper
 {
@@ -13,6 +14,8 @@ final class TaskMapper
         return new TaskEntity(
             id: $task->getId(),
             title: $task->getTitle(),
+            description: $task->getDescription(),
+            assignedUserId: $task->getAssignedUserId(),
             status: $task->getStatus(),
             createdAt: $task->getCreatedAt(),
             completedAt: $task->getCompletedAt(),
@@ -25,6 +28,8 @@ final class TaskMapper
             id: $taskEntity->getId(),
             title: $taskEntity->getTitle(),
             status: $taskEntity->getStatus(),
+            description: $taskEntity->getDescription(),
+            assignedUserId: $taskEntity->getAssignedUserId(),
             createdAt: $taskEntity->getCreatedAt(),
             completedAt: $taskEntity->getCompletedAt(),
         );
