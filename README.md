@@ -255,18 +255,8 @@ Current tests cover:
 Below are the diagrams that reflect the actual implementation of the
 project.
 
-### 1. Task lifecycle
 
-``` mermaid
-stateDiagram-v2
-    [*] --> todo
-
-    todo <--> in_progress : PATCH /tasks/{id}/status=in_progress
-    in_progress <--> done : PATCH /tasks/{id}/status=done
-    done <--> todo : PATCH /tasks/{id}/status=todo
-```
-
-### 2. Task status update flow
+### Task status update flow
 
 ``` mermaid
 sequenceDiagram
@@ -296,7 +286,7 @@ sequenceDiagram
     Controller-->>Client: 200 OK
 ```
 
-### 3. User import flow
+### User import flow
 
 ``` mermaid
 sequenceDiagram
