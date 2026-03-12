@@ -37,7 +37,7 @@ final class TaskController
         private readonly TaskRepositoryInterface $taskRepository,
         private readonly TaskSearchCriteriaFactory $criteriaFactory,
         private readonly TaskSerializer $taskSerializer,
-        private readonly DoctrineTaskEventRepository $taskEventStore,
+        private readonly DoctrineTaskEventRepository $taskEventStore, // todo: use interface instead
     ) {
     }
 
