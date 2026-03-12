@@ -30,10 +30,25 @@ services:
         tags: [ messenger.middleware ]
 
     # user module
-    App\User\Domain\Contracts\UserRepositoryInterface: '@App\User\Infrastructure\InMemory\InMemoryUserRepository'
+#    App\User\Domain\Contracts\UserRepositoryInterface: '@App\User\Infrastructure\InMemory\InMemoryUserRepository'
+    App\User\Domain\Contracts\UserRepositoryInterface: '@App\User\Infrastructure\Doctrine\Repository\DoctrineUserRepository'
 
     # task module
-    App\Task\Infrastructure\Doctrine\DoctrineTaskRepository:
+    App\Task\Infrastructure\Doctrine\Repository\DoctrineTaskRepository:
         arguments:
-            - '@doctrine.orm.entity_manager'
-    App\Task\Domain\Contracts\TaskRepositoryInterface: '@App\Task\Infrastructure\Doctrine\DoctrineTaskRepository'
+            $entityManager: '@doctrine.orm.entity_manager'
+
+    App\Task\Domain\Contracts\TaskRepositoryInterface: '@App\Task\Infrastructure\Doctrine\Repository\DoctrineTaskRepository'
+
+    App\Task\Application\Strategy\TodoTaskStatusStrategy:
+        tags: [ 'app.task_status_strategy' ]
+
+    App\Task\Application\Strategy\InProgressTaskStatusStrategy:
+        tags: [ 'app.task_status_strategy' ]
+
+    App\Task\Application\Strategy\DoneTaskStatusStrategy:
+        tags: [ 'app.task_status_strategy' ]
+
+    App\Task\Application\Strategy\TaskStatusStrategyResolver:
+        arguments:
+            $strategies: !tagged_iterator app.task_status_strategy
