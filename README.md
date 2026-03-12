@@ -249,3 +249,55 @@ Current tests cover:
 - `TaskStatusStrategyResolver`
 
 ---
+
+## Architecture Diagram
+
+``` mermaid
+flowchart LR
+
+Controller[HTTP Controller]
+Controller --> CommandBus[Symfony Messenger Command Bus]
+Controller --> QueryBus[Symfony Messenger Query Bus]
+
+CommandBus --> CommandHandler[Command Handlers]
+QueryBus --> QueryHandler[Query Handlers]
+
+CommandHandler --> Domain[Domain Entities]
+QueryHandler --> Repository[Repositories]
+
+Domain --> Events[Domain Events]
+Events --> EventStore[(task_events table)]
+
+Repository --> Database[(PostgreSQL)]
+```
+
+------------------------------------------------------------------------
+
+## Task Lifecycle
+
+``` mermaid
+stateDiagram-v2
+
+[*] --> todo
+
+todo --> in_progress : start task
+in_progress --> done : complete task
+
+done --> todo : reopen task
+```
+
+------------------------------------------------------------------------
+
+## Task Event Flow
+
+``` mermaid
+sequenceDiagram
+
+Client->>API: POST /tasks
+API->>Domain: Task::create()
+Domain-->>EventStore: TaskCreatedEvent
+
+Client->>API: PATCH /tasks/{id}/status
+API->>Domain: changeStatus()
+Domain-->>EventStore: TaskStatusUpdatedEvent
+```
