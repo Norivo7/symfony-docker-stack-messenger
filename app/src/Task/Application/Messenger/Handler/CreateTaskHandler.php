@@ -19,7 +19,12 @@ final readonly class CreateTaskHandler
 
     public function __invoke(CreateTaskCommand $command): void
     {
-        $task = Task::create($command->id, $command->title);
+        $task = Task::create(
+            $command->id,
+            $command->title,
+            $command->description,
+            $command->assignedUserId
+        );
 
         $this->taskRepository->save($task);
     }
