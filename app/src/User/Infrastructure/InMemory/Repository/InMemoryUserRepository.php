@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\User\Infrastructure\InMemory;
+namespace App\User\Infrastructure\InMemory\Repository;
 
 use App\User\Domain\Contracts\UserRepositoryInterface;
 use App\User\Domain\Entity\User;
@@ -40,5 +40,15 @@ final class InMemoryUserRepository implements UserRepositoryInterface
         }
 
         return null;
+    }
+
+    public function save(User $user): void
+    {
+        // TODO: Implement save() method.
+    }
+
+    public function flush(): void
+    {
+        // TODO: Implement flush() method.
     }
 }
